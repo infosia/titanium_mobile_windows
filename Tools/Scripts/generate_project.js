@@ -56,6 +56,10 @@ function generateProject(example_name, dest, platform, sdkVersion, msdev, arch, 
 	generator = (msdev == MSBUILD_14) ? VS_2015_GENERATOR : VS_2017_GENERATOR;
 	if (arch == 'ARM') {
 		generator += ' ARM';
+	} else if (arch == 'ARM64') {
+		generator += ' ARM64';
+	} else if (arch == 'x64') {
+		generator += ' Win64'
 	}
 
 	// Make sure our intended output dir exists!
@@ -107,7 +111,7 @@ if (module.id === ".") {
 		program
 			.description('Titanium Windows VS Solution Generator')
 			.usage('COMMAND [ARGS] [OPTIONS]')
-			.option('-a, --arch <arch>', '"ARM" (device) or "Win32" (emulator)', /^(ARM|Win32)$/, 'Win32')
+			.option('-a, --arch <arch>', '"ARM/ARM64" (device) or "Win32/x64" (emulator)', /^(ARM|Win32|x64|ARM64)$/, 'Win32')
 			.option('-o, --outputPath <outputPath>', 'Output path for generated code')
 			.option('-p, --platform <platform>', '"WindowsPhone" or "WindowsStore"', /^Windows(Phone|Store)$/, 'WindowsStore')
 			.option('-s, --sdk-version <version>', 'Target a specific Windows SDK version [version]', /^(8\.1|10\.0)$/, WIN_10)

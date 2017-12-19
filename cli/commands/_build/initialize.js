@@ -29,6 +29,8 @@ function initialize(next) {
 	this.debugHost = this.allowDebugging && argv['debug-host'];
 	this.profilerHost = this.allowProfiling && argv['profiler-host'];
 	this.deviceId = argv['device-id'];
+	this.arm = argv['architecture'] === 'arm';
+	this.x64 = argv['architecture'] === 'x64';
 
 	// cmake
 	this.cmakeDir = path.resolve(__dirname, '..', '..', 'vendor', 'cmake');
@@ -37,12 +39,12 @@ function initialize(next) {
 		if (this.target == 'wp-device' || this.target == 'dist-phonestore') {
 			this.cmakeArch = 'ARM';
 		} else {
-			this.cmakeArch = 'Win32';
+			this.cmakeArch = this.arm ? 'ARM' : 'Win32';
 		}
 		this.cmakePlatform = 'WindowsPhone';
 		this.cmakePlatformAbbrev = 'phone';
 	} else {
-		this.cmakeArch = 'Win32';
+		this.cmakeArch = this.arm ? 'ARM' : this.x64 ? 'Win64' : 'Win32';
 		this.cmakePlatform = 'WindowsStore';
 		this.cmakePlatformAbbrev = 'store';
 	}
@@ -50,7 +52,7 @@ function initialize(next) {
 		this.cmakePlatform = 'WindowsStore';
 		this.cmakePlatformAbbrev = 'win10';
 	}
-	this.arch = this.cmakeArch == 'Win32' ? 'x86' : this.cmakeArch;
+	this.arch = this.cmakeArch == 'Win32' ? 'x86' : this.cmakeArch == 'Win64' ? 'x64' : this.cmakeArch;
 	this.cmakeTarget = this.cmakePlatformAbbrev + '.' + this.arch;
 
 	// Detect CMake generator name: e.g. 12.0 -> Visual Studio 12 2013

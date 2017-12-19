@@ -74,22 +74,16 @@ exports.init = function (logger, config, cli) {
 						next();
 					},
 					function(next) {
-						if (sdks.windows.hasOwnProperty('10.0')) {
-							logger.info('Generating Windows 10 Win32 project');
-							runCMake(logger, cmake, projectDir, 'Windows10', 'Win32', generator, next);
-						} else {
-							logger.info('Skipping Windows 10 Win32 project as Windows 10.0 SDK is not installed');
-							next();
-						}
+						logger.info('Generating Windows 10 Win32 project');
+						runCMake(logger, cmake, projectDir, 'Windows10', 'Win32', generator, next);
 					},
 					function(next) {
-						if (sdks.windowsphone.hasOwnProperty('10.0')) {
-							logger.info('Generating Windows 10 ARM project');
-							runCMake(logger, cmake, projectDir, 'Windows10', 'ARM', generator, next);
-						} else {
-							logger.info('Skipping Windows 10 ARM project as Windows 10.0 SDK is not installed');
-							next();
-						}
+						logger.info('Generating Windows 10 ARM project');
+						runCMake(logger, cmake, projectDir, 'Windows10', 'ARM', generator, next);
+					},
+					function(next) {
+						logger.info('Generating Windows 10 x64 project');
+						runCMake(logger, cmake, projectDir, 'Windows10', 'x64', generator, next);
 					}
 				], function(err, result) {
 					if (err) {
@@ -103,8 +97,18 @@ exports.init = function (logger, config, cli) {
 };
 
 function runCMake(logger, cmake, projectDir, targetEnv, targetArch, targetGenerator, callback){
+
+	var generatorSuffix = '';
+	if (targetArch === 'ARM') {
+		generatorSuffix = ' ARM';
+	} else if (targetArch === 'ARM64') {
+		generatorSuffix = ' ARM64';
+	} else if (targetArch === 'x64') {
+		generatorSuffix = ' Win64';
+	}
+
 	var targetDir = path.join(projectDir, targetEnv+'.'+targetArch),
-		generatorName =  targetGenerator+(targetArch === 'ARM' ? ' ARM' : ''),
+		generatorName =  targetGenerator+generatorSuffix,
 		p,
 		originalTargetDir,
 		targetPlatform = (targetEnv == 'Windows10') ? 'WindowsStore' : targetEnv;

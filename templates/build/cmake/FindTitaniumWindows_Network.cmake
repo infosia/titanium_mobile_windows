@@ -21,6 +21,8 @@ endif()
 set(TitaniumWindows_Network_ARCH "x86")
 if(CMAKE_GENERATOR MATCHES "^Visual Studio .+ ARM$")
   set(TitaniumWindows_Network_ARCH "arm")
+elseif(CMAKE_GENERATOR MATCHES "^Visual Studio .+ Win64$")
+  set(TitaniumWindows_Network_ARCH "x64")
 endif()
 
 # Taken and slightly modified from build's TitaniumWindows_Network_Targets.cmake file

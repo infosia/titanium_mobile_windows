@@ -21,6 +21,8 @@ endif()
 set(TitaniumWindows_Sensors_ARCH "x86")
 if(CMAKE_GENERATOR MATCHES "^Visual Studio .+ ARM$")
   set(TitaniumWindows_Sensors_ARCH "arm")
+elseif(CMAKE_GENERATOR MATCHES "^Visual Studio .+ Win64$")
+  set(TitaniumWindows_Sensors_ARCH "x64")
 endif()
 
 # Taken and slightly modified from build's TitaniumWindows_Sensors_Targets.cmake file

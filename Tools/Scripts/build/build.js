@@ -37,7 +37,7 @@ var path = require('path'),
  * @param sdkVersion {String} '8.1' || '10.0'
  * @param msBuildVersion {String} '12.0' || '14.0' || '15.0'
  * @param platform {String} 'WindowsPhone' || 'WindowsStore'
- * @param arch {String} 'x86' || 'ARM'
+ * @param arch {String} 'x86' || 'ARM' || 'x64'
  * @param parallel {Boolean} should we run MSBuild in parallel?
  * @param quiet {Boolean} log stdout of processes?
  * @param callback {Function} what to invoke when done/errored
@@ -118,7 +118,7 @@ function updateBuildValuesInTitaniumModule(githash, tiModuleCPP, callback) {
  * @param buildDir {String} Where to build the project
  * @param buildType {String} 'Release' || 'Debug'
  * @param platform {String} 'WindowsPhone' || 'WindowsStore'
- * @param arch {String} 'x86' || 'ARM'
+ * @param arch {String} 'x86' || 'ARM' || 'x64'
  * @param quiet {Boolean} log stdout of process?
  * @param callback {Function} what to invoke when done/errored
  */
@@ -139,6 +139,8 @@ function runCMake(sourceDir, buildDir, buildType, sdkVersion, msBuildVersion, pl
 
 	if ('ARM' == arch) {
 		generator += ' ARM';
+	} else if ('x64' == arch) {
+		generator += ' Win64';
 	}
 
 	var args = [
@@ -178,7 +180,7 @@ function runNuGet(slnFile, quiet, callback) {
  * @param msBuildVersion {String} The version of MSBuild to run: '12.0' || '14.0' || '15.0'
  * @param slnFile {String} The VS solution file to build.
  * @param buildType {String} 'Release' || 'Debug'
- * @param arch {String} 'x86' || 'ARM'
+ * @param arch {String} 'x86' || 'ARM' || 'x64'
  * @param parallel {Boolean} Run msbuild in parallel? (/m option)
  * @param quiet {Boolean} log stdout of process?
  * @param callback {Function} what to invoke when done/errored
@@ -203,9 +205,16 @@ function runMSBuild(msBuildVersion, slnFile, buildType, arch, parallel, quiet, c
 			process.exit(1);
 		}
 
+		var msbuildPlatformParam = '';
+		if (arch == 'ARM') {
+			msbuildPlatformParam = ' /p:Platform=ARM';
+		} else if (arch == 'x64') {
+			msbuildPlatformParam = ' /p:Platform=x64';
+		}
+
 		// Use spawn directly so we can pipe output as we go
 		var p = spawn((process.env.comspec || 'cmd.exe'), ['/S', '/C', '"', vsInfo.vsDevCmd.replace(/[ \(\)\&]/g, '^$&') +
-			' &&' + ' MSBuild' + (arch==='ARM' ? ' /p:Platform=' + arch : '') + (parallel ? ' /m' : '') + ' /nr:false /p:Configuration=Release ' + slnFile, '"'
+			' &&' + ' MSBuild' + msbuildPlatformParam + (parallel ? ' /m' : '') + ' /nr:false /p:Configuration=Release ' + slnFile, '"'
 		], {windowsVerbatimArguments: true});
 		
 		p.stdout.on('data', function (data) {
@@ -228,7 +237,6 @@ function runMSBuild(msBuildVersion, slnFile, buildType, arch, parallel, quiet, c
 			callback();
 		});
 	});
-
 }
 
 /**
@@ -236,7 +244,7 @@ function runMSBuild(msBuildVersion, slnFile, buildType, arch, parallel, quiet, c
  * @param destDir The top-level destination directory where we copy the built libraries
  * @param buildType 'Release' || 'Debug'
  * @param platformAbbrev 'phone' || 'store' || 'win10'
- * @param arch 'x86' || 'ARM'
+ * @param arch 'x86' || 'ARM' || 'x64'
  * @param callback what to invoke when done/errored
  */
 function copyToDistribution(sourceDir, destDir, buildType, platformAbbrev, arch, callback) {
@@ -383,7 +391,7 @@ function build(sdkVersion, sha, msBuildVersion, buildType, targets, options, fin
 		},
 		function buildAndPackageAll(next) {
 			(options.parallel ? async.each : async.eachSeries)(targets, function (configuration, next) {
-				var parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86)
+				var parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86|x64)
 				buildAndPackage(titaniumWindowsSrc, buildRoot, distLib, buildType, sdkVersion, msBuildVersion, parts[0], parts[1], options.parallel, options.quiet, next);
 			}, next);
 		},
@@ -395,7 +403,7 @@ function build(sdkVersion, sha, msBuildVersion, buildType, targets, options, fin
 		},
 		function copyJavaScriptCore(next) {
 			async.eachSeries(targets, function (configuration, next) {
-				var parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86)
+				var parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86|x64)
 				console.log('Copying JavaScriptCore for ' + parts[1] + '...');
 				var newDir = path.join(distLib, 'JavaScriptCore', 'win10', parts[1]);
 				var fromDir = path.join(process.env.JavaScriptCore_HOME, parts[1]);
@@ -459,7 +467,7 @@ if (module.id === ".") {
 			];
 
 		function collectArches(val, memo) {
-			var m = /^Windows(Store|Phone)\-(x86|ARM)$/.exec(val);
+			var m = /^Windows(Store|Phone)\-(x86|ARM|x64)$/.exec(val);
 			if (m) {
 				memo.push(val);
 			}

@@ -23,12 +23,12 @@ var archiver = require('archiver'),
 	windowslib = require('windowslib'),
 	util = require('util'),
 	spawn = require('child_process').spawn,
-	defaultTypes = ['WindowsPhone', 'WindowsStore', 'Windows10'],
+	defaultTypes = ['Windows10'],
 	types = defaultTypes.slice(0),
-	typesMin = ['phone', 'store', 'win10'],
+	typesMin = ['win10'],
 	configuration = 'Release',
 	EventEmitter = require('events').EventEmitter,
-	vs_architectures = {ARM:'ARM', x86:'Win32'}; // x86 -> Win32 mapping
+	vs_architectures = {ARM:'ARM', x86:'Win32', ARM64:'ARM64', x64:'x64'}; // x86 -> Win32 mapping
 
 function WindowsModuleBuilder() {
 	Builder.apply(this, arguments);
@@ -223,6 +223,9 @@ WindowsModuleBuilder.prototype.generateModuleProject = function generateModulePr
         },
         function(done) {
             runCmake(this, 'WindowsStore', 'ARM', '10.0', done);
+        },
+        function(done) {
+            runCmake(this, 'WindowsStore', 'x64', '10.0', done);
         }
     ];
 
@@ -528,8 +531,18 @@ function rmdir(dirPath, fs, path, logger, removeSelf) {
 }
 
 function runCmake(data, platform, arch, sdkVersion, next) {
+
+	var generatorSuffix = '';
+	if (arch === 'ARM') {
+		generatorSuffix = ' ARM';
+	} else if (arch === 'ARM64') {
+		generatorSuffix = ' ARM64';
+	} else if (arch === 'x64') {
+		generatorSuffix = ' Win64';
+	}
+
     var logger = data.logger,
-        generatorName = selectVisualStudio(data) + (arch==='ARM' ? ' ARM' : ''),
+        generatorName = selectVisualStudio(data) + generatorSuffix,
         cmakeProjectName = (sdkVersion === '10.0' ? 'Windows10' : platform) + '.' + arch,
         cmakeWorkDir = path.resolve(data.projectDir,cmakeProjectName);
 

@@ -21,6 +21,8 @@ endif()
 set(TitaniumWindows_Filesystem_ARCH "x86")
 if(CMAKE_GENERATOR MATCHES "^Visual Studio .+ ARM$")
   set(TitaniumWindows_Filesystem_ARCH "arm")
+elseif(CMAKE_GENERATOR MATCHES "^Visual Studio .+ Win64$")
+  set(TitaniumWindows_Filesystem_ARCH "x64")
 endif()
 
 # Taken and slightly modified from build's TitaniumWindows_Filesystem_Targets.cmake file

@@ -23,6 +23,7 @@
 		"Chris Williams <cwilliams@appcelerator.com>",
 		"Chris Barber <cbarber@appcelerator.com>"
 	],
+	"architectures": ["x86", "x64", "arm"],
 	"vendorDependencies": {
 		"visual studio": ">=12.x <=14.x",
 		"windows phone sdk": "10.0",

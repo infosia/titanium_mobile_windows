@@ -81,7 +81,7 @@ namespace TitaniumWindows
 		std::string ConvertString(Windows::Foundation::Collections::IVector<::Platform::String^>^ strs) 
 		{
 			std::stringstream ss;
-			for (std::size_t i = 0; i < strs->Size; i++) {
+			for (std::uint32_t i = 0; i < strs->Size; i++) {
 				ss << ConvertString(strs->GetAt(i));
 				if (i < strs->Size - 1) {
 					ss << ",";
@@ -121,7 +121,7 @@ namespace TitaniumWindows
 			const auto reader = Windows::Storage::Streams::DataReader::FromBuffer(buffer);
 			std::vector<std::uint8_t> data(reader->UnconsumedBufferLength);
 			if (!data.empty()) {
-				reader->ReadBytes(::Platform::ArrayReference<std::uint8_t>(&data[0], data.size()));
+				reader->ReadBytes(::Platform::ArrayReference<std::uint8_t>(&data[0], static_cast<std::uint32_t>(data.size())));
 			}
 			return data;
 		}

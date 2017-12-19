@@ -294,9 +294,10 @@ function getDeviceId(sdkVersion, target, next) {
  *							device. Something like '8-1-1' for first Windows 8.1 emulator
  * @param count {Number} Tracks how many times we've tried to run this build.
  *											Used so we can finally abort after max retry count.
+ * @param arch {String} x86|x64|arm|arm64
  * @param next {Function} callback function
  **/
-function runBuild(target, deviceId, sdkVersion, count, next) {
+function runBuild(target, deviceId, sdkVersion, count, arch, next) {
 	var prc,
 		inResults = false,
 		done = false,
@@ -309,6 +310,9 @@ function runBuild(target, deviceId, sdkVersion, count, next) {
 			'--win-publisher-id', '13AFB724-65F2-4F30-8994-C79399EDBD80',
 			'--no-prompt', '--no-colors', '--forceUnInstall'
 		];
+	if (arch === 'x64') {
+		args = args.concat('--architecture', 'x64');
+	}
 	if (deviceId) {
 		args = args.concat('--device-id', deviceId);
 	}
@@ -348,7 +352,7 @@ function runBuild(target, deviceId, sdkVersion, count, next) {
 				if (count > MAX_RETRIES) {
 					next("failed to get test results before log ended!"); // failed too many times
 				} else {
-					runBuild(target, deviceId, sdkVersion, count + 1, next); // retry
+					runBuild(target, deviceId, sdkVersion, count + 1, arch, next); // retry
 				}
 			}
 		}
@@ -467,9 +471,10 @@ function cleanNonGaSDKs(sdkPath, next) {
  * @param target {String} 'wp-emulator'|'ws-local'
  * @param deviceId {String} id of the device to run tests on
  * @param prefix {String} prefix to use for test results to uniquely identify them
+ * @param arch {String} architecture to test against (x86|x64|arm|arm64)
  * @param callback {Function} callback function
  */
-function test(sdkVersion, msbuild, branch, target, deviceId, prefix, callback) {
+function test(sdkVersion, msbuild, branch, target, deviceId, prefix, arch, callback) {
 	var sdkPath,
 		shortSdkVersion = sdkRegex.exec(sdkVersion)[1],
 		tiSDKVersion;
@@ -534,7 +539,7 @@ function test(sdkVersion, msbuild, branch, target, deviceId, prefix, callback) {
 		},
 		function (next) {
 			console.log("Launching test project in simulator");
-			runBuild(target, deviceId, shortSdkVersion, 1, next);
+			runBuild(target, deviceId, shortSdkVersion, 1, arch, next);
 		},
 		function (next) {
 			parseTestResults(testResults, next);
@@ -566,6 +571,7 @@ if (module.id === ".") {
 			.option('-C, --device-id [udid]', 'Target a specific device/emulator')
 			.option('-b, --branch [branch]', 'Specify the Titanium SDK build/branch to use for testing', 'master')
 			.option('-p, --prefix [prefix]', 'Set a prefix to put before testsuite names to uniquely identify them') // we run same suite for Windows 8.1/10 and phone/desktop. Use this to prefix tests so we can identify them uniquely?
+			.option('-a, --arch [architecture]', 'Target a specific architecture', /^(x86|x64|arm|arm64)$/, 'x86')
 			.parse(process.argv);
 
 		// When doing win 10, it has to use msbuild 14
@@ -574,7 +580,7 @@ if (module.id === ".") {
 			program.msbuild = MSBUILD_14;
 		}
 		// TODO Use default prefix based on SDK version and target?
-		test(program.sdkVersion, program.msbuild, program.branch, program.target, program.deviceId, program.prefix, function (err, results) {
+		test(program.sdkVersion, program.msbuild, program.branch, program.target, program.deviceId, program.prefix, program.arch, function (err, results) {
 			if (err) {
 				console.error(err.toString().red);
 				process.exit(1);

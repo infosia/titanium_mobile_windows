@@ -51,12 +51,12 @@ namespace Titanium
 		void FileStream::readAsync(const std::shared_ptr<Buffer>& write_buffer, const std::uint32_t& offset, const std::uint32_t& length, const std::function<void(const ErrorResponse&, const std::int32_t&)>& callback)
 		{
 			file__->readBytesAsync(totalBytesProcessed__, length, [this, callback](const Titanium::ErrorResponse& error, const std::vector<std::uint8_t>& data){
-				const auto bytesToRead = data.size();
+				const auto bytesToRead = static_cast<std::uint32_t>(data.size()); // possible loss of data...but do we actually read the data which is bigger than 4GB at once?
 				totalBytesProcessed__ += bytesToRead;
 				if (bytesToRead == 0) {
 					callback(error, -1);
 				} else {
-					callback(error, static_cast<std::uint32_t>(bytesToRead));
+					callback(error, bytesToRead);
 				}
 			});
 		}

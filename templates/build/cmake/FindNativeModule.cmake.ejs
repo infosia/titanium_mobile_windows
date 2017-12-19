@@ -21,6 +21,8 @@ endif()
 set(<%= module.manifest.moduleIdAsIdentifier %>_ARCH "x86")
 if(CMAKE_GENERATOR MATCHES "^Visual Studio .+ ARM$")
   set(<%= module.manifest.moduleIdAsIdentifier %>_ARCH "arm")
+elseif(CMAKE_GENERATOR MATCHES "^Visual Studio .+ Win64$")
+  set(<%= module.manifest.moduleIdAsIdentifier %>_ARCH "x64")
 endif()
 
 # Create imported target <%= module.manifest.moduleIdAsIdentifier %>

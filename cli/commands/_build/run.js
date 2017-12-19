@@ -99,6 +99,8 @@ function runCmake(next) {
 
 	if (this.cmakeArch == 'ARM') {
 		generatorName += ' ARM';
+	} else if (this.cmakeArch == 'Win64') {
+		generatorName += ' Win64';
 	}
 
 	this.logger.debug(this.cmake + ' ' +

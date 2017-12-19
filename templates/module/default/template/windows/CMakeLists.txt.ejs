@@ -32,6 +32,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 set(<%= moduleIdAsIdentifier %>_ARCH "x86")
 if(CMAKE_GENERATOR MATCHES "^Visual Studio .+ ARM$")
   set(<%= moduleIdAsIdentifier %>_ARCH "ARM")
+elseif(CMAKE_GENERATOR MATCHES "^Visual Studio .+ Win64$")
+  set(<%= moduleIdAsIdentifier %>_ARCH "x64")
 endif()
 
 option(<%- moduleIdAsIdentifier %>_DISABLE_TESTS "Disable compiling the tests" OFF)
