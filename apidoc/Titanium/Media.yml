@@ -75,6 +75,14 @@ properties:
     platforms: [windowsphone]
   - name: AUDIO_SESSION_PORT_CARAUDIO
     platforms: [windowsphone]
+  - name: CAMERA_AUTHORIZATION_AUTHORIZED
+    platforms: [windowsphone]
+  - name: CAMERA_AUTHORIZATION_DENIED
+    platforms: [windowsphone]
+  - name: CAMERA_AUTHORIZATION_RESTRICTED
+    platforms: [windowsphone]
+  - name: CAMERA_AUTHORIZATION_UNKNOWN
+    platforms: [windowsphone]
   - name: CAMERA_FLASH_AUTO
     platforms: [windowsphone]
   - name: CAMERA_FLASH_OFF
@@ -154,6 +162,10 @@ properties:
   - name: QUALITY_LOW
     platforms: [windowsphone]
   - name: QUALITY_MEDIUM
+    platforms: [windowsphone]
+  - name: QUALITY_IFRAME_1280x720
+    platforms: [windowsphone]
+  - name: QUALITY_IFRAME_960x540
     platforms: [windowsphone]
   - name: UNKNOWN_ERROR
     platforms: [windowsphone]
@@ -243,17 +255,15 @@ properties:
     platforms: [windowsphone]
   - name: averageMicrophonePower
     platforms: [windowsphone]
+  - name: cameraAuthorization
+    platforms: [windowsphone]
   - name: cameraFlashMode
     platforms: [windowsphone]
   - name: canRecord
     platforms: [windowsphone]
-  - name: currentRoute
-    platforms: [windowsphone]
   - name: isCameraSupported
     platforms: [windowsphone]
   - name: peakMicrophonePower
-    platforms: [windowsphone]
-  - name: systemMusicPlayer
     platforms: [windowsphone]
   - name: volume
     platforms: [windowsphone]
@@ -282,17 +292,21 @@ methods:
     platforms: [windowsphone]
   - name: stopVideoCapture
     platforms: [windowsphone]
-  - name: takeScreenshot
-    platforms: [windowsphone]
-  - name: vibrate
-    platforms: [windowsphone]
-  - name: requestAuthorization
-    platforms: [windowsphone]
   - name: requestAudioRecorderPermissions
+    platforms: [windowsphone]
+  - name: requestCameraPermissions
+    platforms: [windowsphone]
+  - name: requestMusicLibraryPermissions
+    platforms: [windowsphone]
+  - name: requestPhotoGalleryPermissions
+    platforms: [windowsphone]
+  - name: hasAudioRecorderPermissions
     platforms: [windowsphone]
   - name: hasCameraPermissions
     platforms: [windowsphone]
-  - name: requestCameraPermissions
+  - name: hasMusicLibraryPermissions
+    platforms: [windowsphone]
+  - name: hasPhotoGalleryPermissions
     platforms: [windowsphone]
   - name: createAudioPlayer
     platforms: [windowsphone]
@@ -334,14 +348,14 @@ methods:
     platforms: [windowsphone]
   - name: getCanRecord
     platforms: [windowsphone]
-  - name: getCurrentRoute
-    platforms: [windowsphone]
   - name: getIsCameraSupported
     platforms: [windowsphone]
   - name: getPeakMicrophonePower
     platforms: [windowsphone]
-  - name: getSystemMusicPlayer
-    platforms: [windowsphone]
   - name: getVolume
     platforms: [windowsphone]
-
+events:
+  - name: volume
+    platforms: [windowsphone]
+  - name: cameraready
+    platforms: [windowsphone]
