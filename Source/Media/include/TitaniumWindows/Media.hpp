@@ -188,9 +188,9 @@ namespace TitaniumWindows
 
 	protected:
 
-		JSFunction createFileOpenForMusicLibraryFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT;
-		JSFunction createFileOpenForPhotoGalleryFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT;
-		JSFunction createBeepFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT;
+		JSObject createFileOpenForMusicLibraryFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT;
+		JSObject createFileOpenForPhotoGalleryFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT;
+		JSObject createBeepFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT;
 		void takeScreenshotDone(JSObject callback, const std::string& file = "", const bool& hasError = true);
 		void clearScreenshotResources();
 		void takeScreenshotToFile(JSObject callback);
@@ -213,14 +213,14 @@ namespace TitaniumWindows
 		bool isFrontCameraSelected__{ false };
 		Titanium::Media::PhotoGalleryOptionsType openPhotoGalleryOptionsState__;
 		Titanium::Media::MusicLibraryOptionsType openMusicLibraryOptionsState__;
-		JSFunction js_beep__;
+		JSObject js_beep__;
 		Windows::Devices::Enumeration::DeviceInformationCollection^ cameraDevices__{ nullptr };
 		Titanium::Media::CameraOptionsType cameraOptionsState__;
 		bool screenCaptureStarted__{ false };
 		bool cameraPreviewStarted__ { false };
 		bool shouldRemoveRotationEvent__{ false };
-		JSFunction fileOpenForMusicLibraryCallback__;
-		JSFunction fileOpenForPhotoGalleryCallback__;
+		JSObject fileOpenForMusicLibraryCallback__;
+		JSObject fileOpenForPhotoGalleryCallback__;
 		::Platform::Agile<Windows::Media::Capture::MediaCapture> mediaCapture__;
 		::Platform::Collections::Vector<Windows::UI::Xaml::DispatcherTimer^>^ vibrate_timers__;
 		Windows::UI::Xaml::Controls::CaptureElement^ captureElement__;

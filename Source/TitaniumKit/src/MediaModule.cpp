@@ -1157,7 +1157,7 @@ namespace Titanium
 
 		std::unordered_map<std::string, Media::PreviewImageOptions> options;
 
-		for (const auto& name : static_cast<std::vector<JSString>>(js_options.GetPropertyNames())) {
+		for (const auto& name : static_cast<std::vector<std::string>>(js_options.GetPropertyNames())) {
 			options.emplace(name, Media::js_to_PreviewImageOptions(static_cast<JSObject>(js_options.GetProperty(name))));
 		}
 

@@ -36,10 +36,10 @@ namespace TitaniumWindows
 		protected:
 #pragma warning(push)
 #pragma warning(disable : 4251)
-			static JSFunction CreateClickCallback(const JSObject& contentView) TITANIUM_NOEXCEPT;
+			static JSObject CreateClickCallback(const JSObject& contentView) TITANIUM_NOEXCEPT;
 			ScrollView* scrollview__;
 			JSObject contentView__;
-			JSFunction clickCallback__;
+			JSObject clickCallback__;
 #pragma warning(pop)
 		};
 

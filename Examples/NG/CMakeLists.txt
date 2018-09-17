@@ -98,7 +98,6 @@ if(NOT TARGET TitaniumWindows_Native)
 endif()
 
 list(INSERT CMAKE_MODULE_PATH 0 ${Ti_CMAKE_MODULE_DIR})
-find_package(JavaScriptCore REQUIRED)
 
 # No user-servicable parts below this line.
 
@@ -139,8 +138,6 @@ set(SOURCE_Assets
   src/Assets/sample.jpg
   src/Assets/require_test.js
   src/Assets/Styles.xaml
-  ${JavaScriptCore_LIBRARY_DIR}/Release/JavaScriptCore.dll
-  ${JavaScriptCore_LIBRARY_DIR}/Release/WTF.dll
   )
 
 set_property(SOURCE ${SOURCE_Assets} PROPERTY VS_DEPLOYMENT_CONTENT 1)

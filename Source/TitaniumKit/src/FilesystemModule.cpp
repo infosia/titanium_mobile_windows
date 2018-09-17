@@ -12,9 +12,10 @@
 
 namespace Titanium
 {
-	JSFunction FilesystemModule::createOpenStreamFunction(const JSContext& js_context) TITANIUM_NOEXCEPT
+	JSObject FilesystemModule::createOpenStreamFunction(const JSContext& js_context) TITANIUM_NOEXCEPT
 	{
 		const std::string script = R"JS(
+			(function(mode) {
 			var path = Array.prototype.slice.call(arguments, 1).join(Ti.Filesystem.separator);
 			var file = Ti.Filesystem.getFile(path);
 			if (file.exists()) {
@@ -30,8 +31,9 @@ namespace Titanium
 				}
 				throw new Error('Unable to open stream for MODE_READ');
 			}
+			})
 		)JS";
-		return js_context.CreateFunction(script, { "mode" });
+		return static_cast<JSObject>(js_context.JSEvaluateScript(script));
 	}
 
 	FilesystemModule::FilesystemModule(const JSContext& js_context) TITANIUM_NOEXCEPT
@@ -68,16 +70,19 @@ namespace Titanium
 		TITANIUM_ASSERT(File_property.IsObject());  // precondition
 		JSObject File = static_cast<JSObject>(File_property);
 
-		return File.CallAsConstructor(path).GetPrivate<Titanium::Filesystem::File>();
+		return File.CallAsConstructor(get_context().CreateString(path)).GetPrivate<Titanium::Filesystem::File>();
 	}
 
 	File_shared_ptr_t FilesystemModule::createTempDirectory(const JSContext& js_context) TITANIUM_NOEXCEPT
 	{
 		const auto script =
+		"(function() {"
 		"       var file = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, new Date().getTime());"
 		"       file.createDirectory();"
-		"       file;";
+		"       return file;"
+		"})(this)";
 		auto file = js_context.JSEvaluateScript(script);
+		assert(file.IsObject());
 		if (file.IsObject()) {
 			return static_cast<JSObject>(file).GetPrivate<Titanium::Filesystem::File>();
 		}
@@ -86,11 +91,14 @@ namespace Titanium
 	File_shared_ptr_t FilesystemModule::createTempFile(const JSContext& js_context) TITANIUM_NOEXCEPT
 	{
 		const auto script =
+		"(function() {"
 		"       var dir  = Ti.Filesystem.createTempDirectory();"
 		"       var file = Ti.Filesystem.getFile(dir.nativePath, 'tifile' + Math.random().toString(36).substring(2) + '.tmp');"
 		"       file.createFile();"
-		"       file;";
+		"       retrun file;"
+		"})(this)";
 		auto file = js_context.JSEvaluateScript(script);
+		assert(file.IsObject());
 		if (file.IsObject()) {
 			return static_cast<JSObject>(file).GetPrivate<Titanium::Filesystem::File>();
 		}
@@ -203,7 +211,12 @@ namespace Titanium
 				oss << separator;
 			}
 		}
-		const auto object_ptr = filesystem_ptr->getFile(js_context, oss.str());
+		const auto path = oss.str();
+		if (path.empty()) {
+			HAL::detail::ThrowRuntimeError("FilesystemModule", "Empty argument for Ti.Filesystem.getFile");
+			return this_object.get_context().CreateUndefined();
+		}
+		const auto object_ptr = filesystem_ptr->getFile(js_context, path);
 		if (object_ptr != nullptr) {
 			return object_ptr->get_object();
 		}

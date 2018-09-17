@@ -10,6 +10,7 @@
 #include "TitaniumWindows_EXPORT.h"
 #include "Titanium/Filesystem/File.hpp"
 #include "TitaniumWindows/Utility.hpp"
+#include <fstream>
 
 namespace TitaniumWindows
 {

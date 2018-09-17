@@ -16,7 +16,7 @@ namespace Titanium
 	}
 
 	void Accelerometer::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) {
-		HAL_LOG_DEBUG("Accelerometer:: postCallAsConstructor ", this);
+		TITANIUM_LOG_DEBUG("Accelerometer:: postCallAsConstructor ", this);
 	}
 
 	void Accelerometer::JSExportInitialize()

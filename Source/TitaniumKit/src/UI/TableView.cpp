@@ -45,7 +45,7 @@ namespace Titanium
 			model__(std::make_shared<ListModel<TableViewSection>>(false))
 
 		{
-			TITANIUM_LOG_INFO("TableView ctor");
+			TITANIUM_LOG_DEBUG("TableView ctor");
 		}
 
 		std::vector<std::shared_ptr<TableViewSection>> TableView::get_sections() const TITANIUM_NOEXCEPT

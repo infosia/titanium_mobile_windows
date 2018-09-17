@@ -62,14 +62,16 @@ namespace Titanium
 		return object;
 	}
 
-	JSFunction Stream::createPromisifyFunction(const JSContext& js_context) TITANIUM_NOEXCEPT
+	JSObject Stream::createPromisifyFunction(const JSContext& js_context) TITANIUM_NOEXCEPT
 	{
 		const std::string script = R"JS(
-			return function(value) {
-				new Promise(function(resolve){ resolve(value); }).then(callback);
-			};
+			function(callback) {
+				return function(value) {
+					new Promise(function(resolve){ resolve(value); }).then(callback);
+				};
+			}
 		)JS";
-		return js_context.CreateFunction(script, { "callback" });
+		return static_cast<JSObject>(js_context.JSEvaluateScript(script));
 	}
 
 	Stream::Stream(const JSContext& js_context) TITANIUM_NOEXCEPT

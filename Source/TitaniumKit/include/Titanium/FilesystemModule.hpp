@@ -176,8 +176,8 @@ namespace Titanium
 	protected:
 		JSClass file__;
 		JSClass filestream__;
-		JSFunction openStreamFunc__;
-		JSFunction createOpenStreamFunction(const JSContext& js_context) TITANIUM_NOEXCEPT;
+		JSObject openStreamFunc__;
+		JSObject createOpenStreamFunction(const JSContext& js_context) TITANIUM_NOEXCEPT;
 
 	};
 

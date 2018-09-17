@@ -26,10 +26,14 @@ namespace Titanium
 			} else {
 				TITANIUM_LOG_WARN("Failed to process ListDataItem.properties: Not a JSObject");
 			}
-			item.templateId = static_cast<std::string>(object.GetProperty("template"));
+
+			auto templateId = object.GetProperty("template");
+			if (templateId.IsString()) {
+				item.templateId = static_cast<std::string>(templateId);
+			}
 
 			// collect all binding properties
-			for (const auto& name : static_cast<std::vector<JSString>>(object.GetPropertyNames())) {
+			for (const auto& name : static_cast<std::vector<std::string>>(object.GetPropertyNames())) {
 				if (name == "properties" || name == "templates") {
 					continue;
 				}
@@ -41,7 +45,9 @@ namespace Titanium
 		JSObject ListDataItem_to_js(const JSContext& js_context, const ListDataItem& item)
 		{
 			auto object = js_context.CreateObject();
-			object.SetProperty("template", js_context.CreateString(item.templateId));
+			if (!item.templateId.empty()) {
+				object.SetProperty("template", js_context.CreateString(item.templateId));
+			}
 			object.SetProperty("properties", js_context.CreateObject(item.properties));
 			for (auto kv : item.bindings) {
 				object.SetProperty(kv.first, kv.second);
@@ -85,7 +91,7 @@ namespace Titanium
 		}
 
 		void ListSection::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) {
-			HAL_LOG_DEBUG("ListSection:: postCallAsConstructor ", this);
+			TITANIUM_LOG_DEBUG("ListSection:: postCallAsConstructor ", this);
 		}
 
 		ListSection::~ListSection() 

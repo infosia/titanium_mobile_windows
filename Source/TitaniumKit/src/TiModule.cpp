@@ -170,14 +170,14 @@ namespace Titanium
 		  scrollableView__(JSExport<Titanium::UI::ScrollableView>::Class()),
 		  searchBar__(JSExport<Titanium::UI::SearchBar>::Class()),
 		  attributedString__(JSExport<Titanium::UI::AttributedString>::Class()),
-	      userAgent__(js_context.CreateString())
+	      userAgent__("")
 	{
 		TITANIUM_LOG_DEBUG("TiModule:: ctor ", this);
 	}
 
 	void TiModule::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments)
 	{
-		HAL_LOG_DEBUG("TiModule:: postCallAsConstructor ", this);
+		TITANIUM_LOG_DEBUG("TiModule:: postCallAsConstructor ", this);
 	}
 
 	void TiModule::JSExportInitialize()
@@ -474,19 +474,22 @@ namespace Titanium
 		auto global_string = ctx.CreateObject(global_string__);
 		auto titanium = get_object();
 
-		global_object.SetProperty("Titanium", titanium, {JSPropertyAttribute::ReadOnly, JSPropertyAttribute::DontDelete});
-		global_object.SetProperty("Ti", titanium, {JSPropertyAttribute::ReadOnly, JSPropertyAttribute::DontDelete});
+		global_object.SetProperty("Titanium", titanium);
+		global_object.SetProperty("Ti", titanium);
 
 		// Attach all Ti.String properties onto global String
 		auto stringObj = static_cast<JSObject>(global_object.GetProperty("String"));
-		for (const auto& property_name : static_cast<std::vector<JSString>>(global_string.GetPropertyNames())) {
-			stringObj.SetProperty(property_name, global_string.GetProperty(property_name));
+		for (const auto pair : global_string.GetProperties()) {
+			if (pair.first == "prototype" || pair.first == "name") {
+				continue;
+			}
+			stringObj.SetProperty(pair.first, pair.second);
 		}
 
 		// Titanium.String keeps a reference to Global.String module
-		titanium.SetProperty("String", global_string, { JSPropertyAttribute::ReadOnly, JSPropertyAttribute::DontDelete });
+		titanium.SetProperty("String", global_string);
 
-		JSString builtin_functions_script = R"js(
+		std::string builtin_functions_script = R"js(
 			try {
 				console = {};
 				console._times = {};

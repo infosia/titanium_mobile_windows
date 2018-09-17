@@ -6,6 +6,7 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
+#include "HAL/HAL.hpp"
 #include "Titanium/Application.hpp"
 #include <sstream>
 

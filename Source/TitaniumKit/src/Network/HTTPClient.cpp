@@ -301,7 +301,7 @@ namespace Titanium
 					bool useMultipartForm = false;
 					std::map<std::string, JSValue> map;
 					JSObject sendArgs = static_cast<JSObject>(arguments.at(0));
-					for (const auto& property_name : static_cast<std::vector<JSString>>(sendArgs.GetPropertyNames())) {
+					for (const auto& property_name : static_cast<std::vector<std::string>>(sendArgs.GetPropertyNames())) {
 						TITANIUM_ASSERT(sendArgs.GetProperty(property_name).IsObject() || sendArgs.GetProperty(property_name).IsString());
 						JSValue prop = sendArgs.GetProperty(property_name);
 						if (prop.IsObject()) {

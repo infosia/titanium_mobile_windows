@@ -31,11 +31,6 @@ var async = require('async'),
 	// Constants
 	WIN_8_1 = '8.1',
 	WIN_10 = '10.0',
-	// Default JSC URL to build for Win 8.1.
-	JSC_81_URL = 'http://timobile.appcelerator.com.s3.amazonaws.com/jscore/dist/JavaScriptCore-Windows-1472849469.zip',
-	// Default JSC URL for building against Win 10
-	JSC_10_URL = 'http://timobile.appcelerator.com.s3.amazonaws.com/jscore/dist/JavaScriptCore-Windows-1508145738839-win10.zip',
-	JSC_DIR = 'JavaScriptCore', // directory inside zipfile
 	GTEST_URL = (os.platform() === 'win32') ? 'http://timobile.appcelerator.com.s3.amazonaws.com/gtest-1.7.0-windows.zip' : 'http://timobile.appcelerator.com.s3.amazonaws.com/gtest-1.7.0-osx.zip',
 	GTEST_DIR = (os.platform() === 'win32') ? 'gtest-1.7.0-windows' : 'gtest-1.7.0-osx', // directory inside zipfile
 	BOOST_URL = 'http://nchc.dl.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.zip',
@@ -296,35 +291,6 @@ function setupGTest(url, next) {
 }
 
 /**
- * Downloads JavaScriptCore from JSC_URL if necessary, and sets JavaScriptCore_HOME env var to it.
- * @param sdkVersion {String} '8.1' || '10'
- * @param [url] {String} override source URL to grab JSC from.
- * @param next {Function} callback function when finished
- */
-function setupJSC(sdkVersion, url, next) {
-	if (typeof url == 'function') {
-		next = url;
-		url = JSC_URL;
-	}
-
-	console.log('Setting up JavaScriptCore pre-built libraries...');
-	// Download to directory pegged to sdk version
-	var jscHome = path.join(HOME, 'JavaScriptCore-' + sdkVersion);
-	// Set env specific to windows sdk version
-	downloadIfNecessary('JavaScriptCore_' + sdkVersion + '_HOME', jscHome, JSC_DIR, url, function (e) {
-		if (e) {
-			return next(e);
-		}
-		// Then set generic overall env var to the extracted JSC
-		setENV('JavaScriptCore_HOME', jscHome, function (err) {
-			if (err) {
-				return next(err);
-			}
-		});
-	});
-}
-
-/**
  * Modifies PATH to include bin folder of included cmake.
  **/
 function setupCMake(next) {
@@ -344,7 +310,6 @@ function setupCMake(next) {
  * @param [overrides] {Object}
  * @param [overrides.boost] {String} Source URL to use for Boost
  * @param [overrides.gtest] {String} Source URL to use for GTest
- * @param [overrides.jsc] {String} Source URL to use for JavaScriptCore
  * @param callback {Function} callback function when finished
  **/
 function setup(overrides, callback) {
@@ -360,13 +325,6 @@ function setup(overrides, callback) {
 		function (next) {
 			setupGTest(overrides.gtest, next);
 		},
-		function (next) {
-			if (os.platform() === 'win32') {
-				setupJSC(overrides.sdkVersion, overrides.jsc, next);
-			} else {
-				next();
-			}
-		},
 		// Add the included cmake bin dir to the user's PATH?
 		setupCMake
 		// TODO Download a VS2013/VS2015 version? (It's Huuuuuuge! Many GB!)
@@ -377,7 +335,6 @@ function setup(overrides, callback) {
 exports.setup = setup;
 exports.setupBoost = setupBoost;
 exports.setupGTest = setupGTest;
-exports.setupJSC = setupJSC;
 exports.setupCMake = setupCMake;
 
 // When run as single script.
@@ -387,26 +344,15 @@ if (module.id === ".") {
 
 		program
 			.version('0.0.1')
-			.option('-j, --javascriptcore [javascriptcore]', 'Override the source URL for JavaScriptCore')
 			.option('-g, --gtest [gtest]', 'Override the source URL for GTest', GTEST_URL)
 			.option('-b, --boost [boost]', 'Override the source URL for Boost', BOOST_URL)
 			.option('-s, --sdk-version [version]', 'Target a specific Windows SDK version [version]', /^(8\.1|10\.0)$/, WIN_8_1)
 			.allowUnknownOption()
 			.parse(process.argv);
 
-		// If not overriding the JSC URL pick default based on sdk version we're targetting
-		if (!program.javascriptcore) {
-			if (program.sdkVersion === WIN_10) {
-				program.javascriptcore = JSC_10_URL;
-			} else {
-				program.javascriptcore = JSC_81_URL;
-			}
-		}
-
 		setup({
 			boost: program.boost,
 			gtest: program.gtest,
-			jsc: program.javascriptcore,
 			sdkVersion: program.sdkVersion
 		}, function (err, results) {
 			if (err) {

@@ -30,7 +30,7 @@ namespace Titanium
 				    }
 					return null;
 				}};
-				item;
+				return item;
 			)", exportObj));
 			object.SetProperty("code", js_context.CreateNumber(config.code));
 			object.SetProperty("cropRect", Titanium::UI::Dimension_to_js(js_context, config.cropRect));

@@ -22,17 +22,20 @@ namespace Titanium
 		if (skip) return defaultValue;
 
 		// Statically create loadJson javascript function
-		static JSFunction loadJson = get_context().CreateFunction(
+		static JSObject loadJson = static_cast<JSObject>(get_context().JSEvaluateScript(
+			"(function() {"
 			"var file = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory+Ti.Filesystem.separator+'_app_info_.json');"
 			"if (file.exists()) return JSON.parse(file.read().text);"
-		);
+			"})"
+		));
 
 		// Statically create readJson javascript function
-		static JSFunction readJson = get_context().CreateFunction(
+		static JSObject readJson = static_cast<JSObject>(get_context().JSEvaluateScript(
+			"(function(json, property) {"
 			"if (json != undefined && property in json) return json[property];"
-			"return null;",
-			{"json", "property"}
-		);
+			"return null;"
+			"})"
+		));
 
 		// Load _app_info_.json
 		if (app_info__.IsUndefined()) {
@@ -83,7 +86,7 @@ namespace Titanium
 	}
 
 	void AppModule::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) {
-		HAL_LOG_DEBUG("AppModule:: postCallAsConstructor ", this);
+		TITANIUM_LOG_DEBUG("AppModule:: postCallAsConstructor ", this);
 	}
 
 	void AppModule::loadAppInfo() TITANIUM_NOEXCEPT

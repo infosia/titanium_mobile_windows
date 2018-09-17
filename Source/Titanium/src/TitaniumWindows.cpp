@@ -175,16 +175,20 @@ namespace TitaniumWindows
 
 		application__ = std::make_shared<Titanium::Application>(js_context__);
 
-		const auto js_context_ref = reinterpret_cast<std::intptr_t>(static_cast<JSContextRef>(js_context__));
+		const auto js_context_ref = reinterpret_cast<std::intptr_t>(static_cast<JsContextRef>(js_context__));
 		auto preloaded = TitaniumModulePreload(js_context_ref);
 		auto js_preloaded_modules = js_context__.CreateObject();
 		if (preloaded) {
-			js_preloaded_modules = JSObject(js_context__, reinterpret_cast<JSObjectRef>(TitaniumModulePreload(js_context_ref)));
+			js_preloaded_modules = JSObject(reinterpret_cast<JsValueRef>(TitaniumModulePreload(js_context_ref)));
 		}
 
 		// store all preloaded native modules
 		std::unordered_map<std::string, JSValue> preloaded_modules;
-		for (const auto& property_name : static_cast<std::vector<JSString>>(js_preloaded_modules.GetPropertyNames())) {
+		for (const auto& property_name : static_cast<std::vector<std::string>>(js_preloaded_modules.GetPropertyNames())) {
+			// Don't copy special properties
+			if (property_name == "caller" || property_name == "arguments" || property_name == "constructor") {
+				continue;
+			}
 			preloaded_modules.emplace(property_name, js_preloaded_modules.GetProperty(property_name));
 		}
 

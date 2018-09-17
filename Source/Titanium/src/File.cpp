@@ -291,7 +291,7 @@ namespace TitaniumWindows
 			TITANIUM_ASSERT(File_property.IsObject());  // precondition
 			JSObject File = static_cast<JSObject>(File_property);
 
-			return File.CallAsConstructor(parent).GetPrivate<Titanium::Filesystem::File>();
+			return File.CallAsConstructor(get_context().CreateString(parent)).GetPrivate<Titanium::Filesystem::File>();
 		}
 
 		bool File::get_readonly() const TITANIUM_NOEXCEPT
@@ -373,6 +373,9 @@ namespace TitaniumWindows
 
 		bool File::createDirectory() TITANIUM_NOEXCEPT
 		{
+			if (path_.empty()) {
+				return false;
+			}
 			// check that parent exists, and if not, create it first!
 			auto parent = get_parent();
 			if (parent == nullptr) {
@@ -392,6 +395,9 @@ namespace TitaniumWindows
 
 		bool File::createFile() TITANIUM_NOEXCEPT
 		{
+			if (path_.empty()) {
+				return false;
+			}
 			const bool result = createEmptyFile(path_);
 			if (result) {
 				// because this creates new file which didn't exist, update the
@@ -645,21 +651,26 @@ namespace TitaniumWindows
 
 		bool File::prepareWrite() 
 		{
+			if (path_.empty()) {
+				TITANIUM_LOG_WARN("File::write: Can't write to directory because path is empty.");
+				return false;
+			}
+
 			// if this item represents folder, write will never work
 			if (isFolder()) {
-				TITANIUM_LOG_WARN("File::write: Can't write to directory");
+				TITANIUM_LOG_WARN("File::write: Can't write to directory: " + path_);
 				return false;
 			}
 
 			if (file_ == nullptr) {
 				// create empty file, then retrieve StorageFile object
 				if (!createEmptyFile(path_)) {
-					TITANIUM_LOG_WARN("File::write: Can't write to file");
+					TITANIUM_LOG_WARN("File::write: Can't write to file: " + path_);
 					return false;
 				}
 				file_ = getFileFromPathSync(path_);
 				if (file_ == nullptr) {
-					TITANIUM_LOG_WARN("File::write: Can't get file");
+					TITANIUM_LOG_WARN("File::write: Can't get file " + path_);
 					return false;
 				}
 			}

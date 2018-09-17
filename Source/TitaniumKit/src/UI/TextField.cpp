@@ -50,10 +50,10 @@ namespace Titanium
 		      autocapitalization__(TEXT_AUTOCAPITALIZATION::NONE),
 		      borderStyle__(INPUT_BORDERSTYLE::NONE),
 		      clearButtonMode__(INPUT_BUTTONMODE::NEVER),
-			  color__(js_context.CreateString()),
+			  color__(""),
 			  editable__(js_context.CreateBoolean(true)),
 			  ellipsize__(js_context.CreateBoolean(false)),
-			  hintText__(js_context.CreateString()),
+			  hintText__(""),
 		      leftButtonMode__(INPUT_BUTTONMODE::NEVER),
 			  maxLength__(js_context.CreateNumber(-1)),
 			  passwordMask__(js_context.CreateBoolean(false)),
@@ -61,7 +61,7 @@ namespace Titanium
 		      rightButtonMode__(INPUT_BUTTONMODE::NEVER),
 			  suppressReturn__(js_context.CreateBoolean(false)),
 		      textAlign__(TEXT_ALIGNMENT::LEFT),
-			  value__(js_context.CreateString()),
+			  value__(""),
 		      verticalAlign__(TEXT_VERTICAL_ALIGNMENT::CENTER)
 		{
 		}

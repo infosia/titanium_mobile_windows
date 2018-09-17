@@ -19,7 +19,7 @@ namespace Titanium
 
 	void MapModule::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments)
 	{
-		HAL_LOG_DEBUG("MapModule:: postCallAsConstructor ", this);
+		TITANIUM_LOG_DEBUG("MapModule:: postCallAsConstructor ", this);
 	}
 
 	TITANIUM_PROPERTY_GETTER(MapModule, HYBRID_TYPE)

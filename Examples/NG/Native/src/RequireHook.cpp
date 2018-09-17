@@ -37,7 +37,7 @@ namespace TitaniumWindows_Native
 	// This should return pointer to JSObject (key-value) which consists of module name & preloaded JSObject
 	std::intptr_t RequireHook::OnTitaniumModulePreload(std::intptr_t js_context_ref)
 	{
-		const auto js_context = JSContext(reinterpret_cast<JSContextRef>(js_context_ref));
+		const auto js_context = JSContext(reinterpret_cast<JsContextRef>(js_context_ref));
 
 		auto js_preloaded_module_map = js_context.CreateObject();
 
@@ -48,7 +48,7 @@ namespace TitaniumWindows_Native
 		//// INITIALLIZE PRELOADED NATIVE MODULE START
 		//// INITIALLIZE PRELOADED NATIVE MODULE END
 
-		return reinterpret_cast<std::intptr_t>(static_cast<JSValueRef>(js_preloaded_module_map));
+		return reinterpret_cast<std::intptr_t>(static_cast<JsValueRef>(js_preloaded_module_map));
 	}
 
 	// This should return collections of supported name module names such as Windows.UI.Xaml.Controls.Button etc.

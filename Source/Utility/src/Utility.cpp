@@ -372,18 +372,16 @@ namespace TitaniumWindows
 		HAL::JSValue GetTiBlobForFile(const HAL::JSContext& js_context, const std::string& path)
 		{
 			const std::string blob_read = R"(
-			function blob_read(path) {
+			(function(path) {
 				var f = Ti.Filesystem.getFile(path);
 				if (f.exists()) {
 					return f.read();
 				}
-			}
-			blob_read;
+			})
 			)";
 
 			// read file and get blob.
-			auto object = js_context.CreateObject();
-			auto blob_read_func = static_cast<HAL::JSObject>(js_context.JSEvaluateScript(blob_read, object));
+			auto blob_read_func = static_cast<HAL::JSObject>(js_context.JSEvaluateScript(blob_read));
 			return blob_read_func({ js_context.CreateString(path) }, blob_read_func);
 		}
 

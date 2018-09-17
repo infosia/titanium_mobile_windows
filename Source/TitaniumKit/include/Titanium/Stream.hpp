@@ -121,8 +121,8 @@ namespace Titanium
 		JSValue MODE_READ__;
 		JSValue MODE_WRITE__;
 		// Create a function to ensure callback is always done with Promise-like async manner
-		JSFunction promisifyFunc__;
-		JSFunction createPromisifyFunction(const JSContext& js_context) TITANIUM_NOEXCEPT;
+		JSObject promisifyFunc__;
+		JSObject createPromisifyFunction(const JSContext& js_context) TITANIUM_NOEXCEPT;
 #pragma warning(pop)
 	};
 

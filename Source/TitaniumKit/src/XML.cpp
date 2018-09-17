@@ -42,7 +42,7 @@ this.exports.serializeToString = function(_xml) {
 	}
 
 	void XML::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) {
-		HAL_LOG_DEBUG("XML:: postCallAsConstructor ", this);
+		TITANIUM_LOG_DEBUG("XML:: postCallAsConstructor ", this);
 	}
 
 	void XML::JSExportInitialize()

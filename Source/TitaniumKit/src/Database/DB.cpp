@@ -30,7 +30,7 @@ namespace Titanium
 
 		void DB::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments)
 		{
-			HAL_LOG_DEBUG("DB:: postCallAsConstructor ", this);
+			TITANIUM_LOG_DEBUG("DB:: postCallAsConstructor ", this);
 
 			// When called to represent class
 			if (arguments.empty()) {
@@ -82,7 +82,7 @@ namespace Titanium
 			TITANIUM_ASSERT(File_property.IsObject());  // precondition
 			JSObject File = static_cast<JSObject>(File_property);
 
-			return File.CallAsConstructor(path__);
+			return File.CallAsConstructor(get_context().CreateString(path__));
 		}
 
 		int64_t DB::get_lastInsertRowId() const TITANIUM_NOEXCEPT

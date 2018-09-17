@@ -182,3 +182,5 @@ function get_type(variable) {
 function str_repeat(input, multiplier) {
 		return Array(multiplier + 1).join(input)
 }
+
+this.format = sprintf;

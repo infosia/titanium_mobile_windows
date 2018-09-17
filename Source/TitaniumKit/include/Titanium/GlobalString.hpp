@@ -32,7 +32,6 @@ namespace Titanium
 		virtual std::string formatTime(JSObject date, std::string format) TITANIUM_NOEXCEPT;
 
 		GlobalString(const JSContext&) TITANIUM_NOEXCEPT;
-		virtual void postInitialize(JSObject& object) override;
 
 		virtual ~GlobalString() TITANIUM_NOEXCEPT;
 		GlobalString(const GlobalString&) = default;
@@ -46,6 +45,7 @@ namespace Titanium
 
 		static JSObject GetStaticObject(const JSContext& js_context) TITANIUM_NOEXCEPT;
 		
+		TITANIUM_PROPERTY_READONLY_DEF(format);
 		TITANIUM_FUNCTION_DEF(formatCurrency);
 		TITANIUM_FUNCTION_DEF(formatDate);
 		TITANIUM_FUNCTION_DEF(formatDecimal);

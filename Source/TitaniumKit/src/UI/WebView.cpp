@@ -196,7 +196,7 @@ namespace Titanium
 				TITANIUM_ASSERT(_1.IsObject());
 				const auto js_options = static_cast<JSObject>(_1);
 				// extract JSObject into C++ unordered_map
-				for (const auto& property_name : static_cast<std::vector<JSString>>(js_options.GetPropertyNames())) {
+				for (const auto& property_name : static_cast<std::vector<std::string>>(js_options.GetPropertyNames())) {
 					options.emplace(property_name, static_cast<std::string>(js_options.GetProperty(property_name)));
 				}
 			}

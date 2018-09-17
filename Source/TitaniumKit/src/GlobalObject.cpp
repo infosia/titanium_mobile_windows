@@ -32,7 +32,7 @@ namespace Titanium
 	}
 
 	void GlobalObject::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) {
-		HAL_LOG_DEBUG("GlobalObject:: postCallAsConstructor ", this);
+		TITANIUM_LOG_DEBUG("GlobalObject:: postCallAsConstructor ", this);
 	}
 
 	GlobalObject::~GlobalObject() TITANIUM_NOEXCEPT
@@ -331,9 +331,9 @@ namespace Titanium
 				//
 				// app entry point should not be treated as "CommonJS module". It should expose every variables to children.
 				//
-				if (moduleId == "/app") {
+				if (module_path == "/app.js") {
 					const std::string app_module_js = "try {__dirname='/',__filename='app.js'; " + module_js + "} catch (E) { E.fileName='app.js'; Titanium_RedScreenOfDeath(E);}";
-					result = js_context.JSEvaluateScript(app_module_js, js_context.get_global_object());
+					result = js_context.JSEvaluateScript(app_module_js);
 				} else {
 					const std::string require_module_js = "(function(global) { var exports={},__OXP=exports,module={'exports':exports},__dirname='" + currentDir__ + "',__filename='"
 						+ module_path + "';try {" + module_js + R"JS(
@@ -350,7 +350,7 @@ namespace Titanium
 					  }
 					})(this);
 					)JS";
-					result = js_context.JSEvaluateScript(require_module_js, js_context.get_global_object(), module_path);
+					result = js_context.JSEvaluateScript(require_module_js, module_path);
 				}
 			} else {
 				currentDir__ = dirname; // Should ensure this gets reset on _EVERY_ code branch possible here. Would be nice if C++/CX had finally blocks
@@ -535,7 +535,7 @@ namespace Titanium
 
 	TITANIUM_PROPERTY_GETTER(GlobalObject, global)
 	{
-		return get_context().JSEvaluateScript("this;");
+		return get_context().get_global_object();
 	}
 
 	TITANIUM_FUNCTION(GlobalObject, require)

@@ -18,9 +18,9 @@ namespace Titanium
 		Label::Label(const JSContext& js_context) TITANIUM_NOEXCEPT
 		    : View(js_context, "Ti.UI.Label"),
 		      autoLink__({AUTOLINK::NONE}),
-		      color__(js_context.CreateString()),
+		      color__(""),
 		      ellipsize__(false),
-		      text__(js_context.CreateString()),
+		      text__(""),
 		      textAlign__(TEXT_ALIGNMENT::LEFT),
 		      verticalAlign__(TEXT_VERTICAL_ALIGNMENT::CENTER),
 		      wordWrap__(js_context.CreateBoolean(true))

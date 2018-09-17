@@ -17,10 +17,10 @@ namespace Titanium
 	{
 		Button::Button(const JSContext& js_context) TITANIUM_NOEXCEPT
 		    : View(js_context, "Ti.UI.Button"),
-			  color__(js_context.CreateString()),
-			  image__(js_context.CreateString()),
+			  color__(""),
+			  image__(""),
 			  textAlign__(TEXT_ALIGNMENT::LEFT),
-			  title__(js_context.CreateString()),
+			  title__(""),
 			  verticalAlign__(TEXT_VERTICAL_ALIGNMENT::CENTER)
 		{
 			TITANIUM_LOG_DEBUG("Button:: ctor ", this);

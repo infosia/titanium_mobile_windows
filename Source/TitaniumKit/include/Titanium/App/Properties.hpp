@@ -160,8 +160,8 @@ namespace Titanium
 			TITANIUM_FUNCTION_DEF(setString);
 
 		private:
-			JSFunction stringify_function__;
-			JSFunction createStringifyFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT;
+			JSObject stringify_function__;
+			JSObject createStringifyFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT;
 			JSObject app_properties__;
 
 		};

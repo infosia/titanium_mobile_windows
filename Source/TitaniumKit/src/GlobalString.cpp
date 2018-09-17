@@ -18,19 +18,6 @@ namespace Titanium
 		TITANIUM_LOG_DEBUG("GlobalString:: ctor ", this);
 	}
 
-	void GlobalString::postInitialize(JSObject& this_object) 
-	{
-		HAL_LOG_DEBUG("GlobalString:: postInitialize ", this);
-
-		const auto ctx = this_object.get_context();
-
-		// Create cross-platform String.format
-		auto stringObject = static_cast<JSObject>(ctx.get_global_object().GetProperty("String"));
-		auto formatObject = ctx.CreateObject();
-		ctx.JSEvaluateScript(sprintf_js, formatObject);
-		stringObject.SetProperty("format", ctx.JSEvaluateScript("sprintf;", formatObject));
-	}
-
 	GlobalString::~GlobalString() TITANIUM_NOEXCEPT
 	{
 		TITANIUM_LOG_DEBUG("GlobalString:: dtor ", this);
@@ -66,6 +53,7 @@ namespace Titanium
 		JSExport<GlobalString>::SetClassVersion(1);
 		JSExport<GlobalString>::SetParent(JSExport<JSExportObject>::Class());
 		
+		TITANIUM_ADD_CONSTANT_PROPERTY(GlobalString, format);
 		TITANIUM_ADD_FUNCTION(GlobalString, formatCurrency);
 		TITANIUM_ADD_FUNCTION(GlobalString, formatDate);
 		TITANIUM_ADD_FUNCTION(GlobalString, formatDecimal);
@@ -81,6 +69,18 @@ namespace Titanium
 		JSValue Object_property = Titanium.GetProperty("String");
 		TITANIUM_ASSERT(Object_property.IsObject());  // precondition
 		return static_cast<JSObject>(Object_property);
+	}
+
+	TITANIUM_PROPERTY_GETTER(GlobalString, format)
+	{
+		const auto js_context = get_context();
+
+		// Create cross-platform String.format
+		auto stringObject = static_cast<JSObject>(js_context.get_global_object().GetProperty("String"));
+		auto formatObject = js_context.CreateObject();
+		js_context.JSEvaluateScript(sprintf_js, formatObject);
+
+		return formatObject.GetProperty("format");
 	}
 
 	TITANIUM_FUNCTION(GlobalString, formatCurrency) 

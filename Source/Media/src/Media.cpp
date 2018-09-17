@@ -60,28 +60,34 @@ namespace TitaniumWindows
 	using namespace Windows::Storage::Search;
 	using namespace concurrency;
 
-	JSFunction MediaModule::createFileOpenForPhotoGalleryFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT
+	JSObject MediaModule::createFileOpenForPhotoGalleryFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT
 	{
-		return js_context.CreateFunction(R"JS(
+		return static_cast<JSObject>(js_context.JSEvaluateScript(R"JS(
+			(function(e) {
 			Ti.App.removeEventListener('windows.fileOpenFromPicker', this);
 			Ti.Media._postOpenPhotoGallery(e.files);
-		)JS", { "e" });
+			})
+		)JS"));
 	}
 
-	JSFunction MediaModule::createFileOpenForMusicLibraryFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT
+	JSObject MediaModule::createFileOpenForMusicLibraryFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT
 	{
-		return js_context.CreateFunction(R"JS(
+		return static_cast<JSObject>(js_context.JSEvaluateScript(R"JS(
+			(function(e) {
 			Ti.App.removeEventListener('windows.fileOpenFromPicker', this);
 			Ti.Media._postOpenMusicLibrary(e.files);
-		)JS", { "e" });
+			})
+		)JS"));
 	}
 
-	JSFunction MediaModule::createBeepFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT
+	JSObject MediaModule::createBeepFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT
 	{
 		// Play beep.wav under application directory
-		return js_context.CreateFunction(R"JS(
+		return static_cast<JSObject>(js_context.JSEvaluateScript(R"JS(
+			(function() {
 			Ti.Media.createSound({url:'beep.wav'}).play();
-		)JS");
+			})
+		)JS"));
 	}
 
 	void MediaModule::beep() TITANIUM_NOEXCEPT

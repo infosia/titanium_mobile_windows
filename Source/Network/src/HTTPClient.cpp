@@ -258,7 +258,7 @@ namespace TitaniumWindows
 
 						// Fire onerror only if there's an onerror handler registered and status code is 400-599.
 						// Otherwise fire onload (so 400-599 fall back to onload if no onerror handler)
-						if (onerror__ && onerror__.IsObject() && static_cast<JSObject>(onerror__).IsFunction() && status__ >= 400 && status__ <= 599) {
+						if (onerror__.IsObject() && static_cast<JSObject>(onerror__).IsFunction() && status__ >= 400 && status__ <= 599) {
 							RunOnUIThread([=]() {
 								onerror(status__, "HTTP Error", false);
 							});

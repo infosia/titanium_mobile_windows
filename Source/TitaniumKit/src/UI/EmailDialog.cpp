@@ -36,7 +36,7 @@ namespace Titanium
 		}
 
 		void EmailDialog::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) {
-			HAL_LOG_DEBUG("EmailDialog:: postCallAsConstructor ", this);
+			TITANIUM_LOG_DEBUG("EmailDialog:: postCallAsConstructor ", this);
 		}
 
 		TITANIUM_PROPERTY_GETTER(EmailDialog, CANCELLED)

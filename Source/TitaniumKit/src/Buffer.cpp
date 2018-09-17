@@ -253,9 +253,9 @@ namespace Titanium
 		TITANIUM_ADD_FUNCTION(Buffer, setType);
 		TITANIUM_ADD_FUNCTION(Buffer, getByteOrder);
 		TITANIUM_ADD_FUNCTION(Buffer, setByteOrder);
-		JSExport<Buffer>::AddHasPropertyCallback(std::mem_fn(&Buffer::js_hasProperty));
-		JSExport<Buffer>::AddGetPropertyCallback(std::mem_fn(&Buffer::js_getProperty));
-		JSExport<Buffer>::AddSetPropertyCallback(std::mem_fn(&Buffer::js_setProperty));
+		// TODO IMPLEMENT JSExport<Buffer>::AddHasPropertyCallback(std::mem_fn(&Buffer::js_hasProperty));
+		// TODO IMPLEMENT JSExport<Buffer>::AddGetPropertyCallback(std::mem_fn(&Buffer::js_getProperty));
+		// TODO IMPLEMENT JSExport<Buffer>::AddSetPropertyCallback(std::mem_fn(&Buffer::js_setProperty));
 	}
 
 	TITANIUM_PROPERTY_GETTER_UINT(Buffer, length);

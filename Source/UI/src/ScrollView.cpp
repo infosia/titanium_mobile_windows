@@ -24,12 +24,14 @@ namespace TitaniumWindows
 		{
 		}
 
-		JSFunction ScrollViewLayoutDelegate::CreateClickCallback(const JSObject& contentView) TITANIUM_NOEXCEPT
+		JSObject ScrollViewLayoutDelegate::CreateClickCallback(const JSObject& contentView) TITANIUM_NOEXCEPT
 		{
 			const std::string script = R"JS(
+				(function(e) {
                  this._ti_scrollview_click_event_source_ = e.source;
+				})
             )JS";
-			return contentView.get_context().CreateFunction(script, {"e"});
+			return static_cast<JSObject>(contentView.get_context().JSEvaluateScript(script));
 		}
 
 		void ScrollViewLayoutDelegate::requestLayout(const bool& fire_event)

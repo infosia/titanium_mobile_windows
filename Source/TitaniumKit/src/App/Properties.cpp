@@ -13,9 +13,9 @@ namespace Titanium
 {
 	namespace App
 	{
-		JSFunction Properties::createStringifyFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT
+		JSObject Properties::createStringifyFunction(const JSContext& js_context) const TITANIUM_NOEXCEPT
 		{
-			return get_context().CreateFunction("return JSON.stringify(value);", { "value" });
+			return static_cast<JSObject>(get_context().JSEvaluateScript("(function(value) { return JSON.stringify(value); })"));
 		}
 
 		Properties::Properties(const JSContext& js_context) TITANIUM_NOEXCEPT
@@ -27,23 +27,26 @@ namespace Titanium
 		}
 
 		void Properties::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) {
-			HAL_LOG_DEBUG("Properties:: postCallAsConstructor ", this);
+			TITANIUM_LOG_DEBUG("Properties:: postCallAsConstructor ", this);
 		}
 
 		void Properties::loadAppProperties() TITANIUM_NOEXCEPT
 		{
 			// Statically create loadJson javascript function
-			static JSFunction loadJson = get_context().CreateFunction(
+			static JSObject loadJson = static_cast<JSObject>(get_context().JSEvaluateScript(
+				"(function loadJson() {"
 				"var file = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory+Ti.Filesystem.separator+'_app_props_.json');"
 				"if (file.exists()) return JSON.parse(file.read().text);"
-				);
+				"})"
+				));
 
 			// Statically create readJson javascript function
-			static JSFunction readJson = get_context().CreateFunction(
+			static JSObject readJson = static_cast<JSObject>(get_context().JSEvaluateScript(
+				"(function(json, property) {"
 				"if (json != undefined && property in json) return json[property];"
-				"return null;",
-				{ "json", "property" }
-			);
+				"return null;"
+				"})"
+			));
 
 			// Load _app_props_.json
 			const auto result = loadJson(get_context().get_global_object());
@@ -128,12 +131,7 @@ namespace Titanium
 
 		std::vector<std::string> Properties::listProperties() TITANIUM_NOEXCEPT
 		{
-			const auto names = static_cast<std::vector<JSString>>(app_properties__.GetPropertyNames());
-			std::vector<std::string> result;
-			for (size_t i = 0; i < names.size(); i++) {
-				result.push_back(static_cast<std::string>(names.at(i)));
-			}
-			return result;
+			return static_cast<std::vector<std::string>>(app_properties__.GetPropertyNames());
 		}
 
 		void Properties::removeAllProperties() TITANIUM_NOEXCEPT

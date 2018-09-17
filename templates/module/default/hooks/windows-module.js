@@ -59,7 +59,7 @@ exports.init = function (logger, config, cli) {
 			var cmakeDir = path.resolve(data.sdk.path, 'windows', 'cli', 'vendor', 'cmake'),
 				cmake = path.join(cmakeDir, 'bin', 'cmake.exe'),
 				projectDir = path.join(data.projectDir, 'windows'),
-				cmakeFinds = ['HAL', 'JavascriptCore', 'TitaniumKit', 'TitaniumWindows_Utility'],
+				cmakeFinds = ['HAL', 'TitaniumKit', 'TitaniumWindows_Utility'],
 				cmakeFindDirSrc = path.join(data.sdk.path, 'windows', 'templates', 'build', 'cmake'),
 				cmakeFindDirDst = path.join(projectDir, 'cmake');
 

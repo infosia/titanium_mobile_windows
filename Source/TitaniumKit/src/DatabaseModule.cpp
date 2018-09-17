@@ -58,7 +58,7 @@ namespace Titanium
 
 	void DatabaseModule::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments)
 	{
-		HAL_LOG_DEBUG("DatabaseModule:: postCallAsConstructor ", this);
+		TITANIUM_LOG_DEBUG("DatabaseModule:: postCallAsConstructor ", this);
 	}
 
 	DatabaseModule::~DatabaseModule() TITANIUM_NOEXCEPT

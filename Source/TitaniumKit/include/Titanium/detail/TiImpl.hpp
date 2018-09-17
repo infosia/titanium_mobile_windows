@@ -62,10 +62,10 @@ JSExport<MODULE>::AddFunctionProperty(#NAME, std::mem_fn(&MODULE::js_##NAME))
 
 // For adding a value as a read-only property on the JS Object this type backs (cpp, in JSExportInitialize)
 #define TITANIUM_ADD_PROPERTY_READONLY(MODULE, NAME) \
-JSExport<MODULE>::AddValueProperty(#NAME, std::mem_fn(&MODULE::js_get_##NAME))
+JSExport<MODULE>::AddValueProperty(#NAME, std::mem_fn(&MODULE::js_get_##NAME), nullptr)
 
 #define TITANIUM_ADD_PROPERTY_READONLY_NOENUMERABLE(MODULE, NAME) \
-JSExport<MODULE>::AddValueProperty(#NAME, std::mem_fn(&MODULE::js_get_##NAME),nullptr,false)
+JSExport<MODULE>::AddValueProperty(#NAME, std::mem_fn(&MODULE::js_get_##NAME),nullptr)
 
 // For adding a value as a constant property on the JS Object this type backs (cpp, in JSExportInitialize)
 #define TITANIUM_ADD_CONSTANT_PROPERTY(MODULE, NAME) \
@@ -76,7 +76,7 @@ JSExport<MODULE>::AddConstantProperty(#NAME, std::mem_fn(&MODULE::js_get_##NAME)
 JSExport<MODULE>::AddValueProperty(#NAME, std::mem_fn(&MODULE::js_get_##NAME), std::mem_fn(&MODULE::js_set_##NAME))
 
 #define TITANIUM_ADD_PROPERTY_NOENUMERABLE(MODULE, NAME) \
-JSExport<MODULE>::AddValueProperty(#NAME, std::mem_fn(&MODULE::js_get_##NAME), std::mem_fn(&MODULE::js_set_##NAME), false)
+JSExport<MODULE>::AddValueProperty(#NAME, std::mem_fn(&MODULE::js_get_##NAME), std::mem_fn(&MODULE::js_set_##NAME))
 
 #define JSOBJECT_GETPROPERTY(IN, NAME, TYPE, DEFAULT_VALUE) \
 IN.HasProperty(#NAME) ? static_cast<TYPE>(IN.GetProperty(#NAME)) : DEFAULT_VALUE
@@ -461,6 +461,8 @@ TITANIUM_PROPERTY_SETTER(MODULE, NAME) { \
 #define TITANIUM_EXCEPTION_CATCH_END_CTX(CTX) \
 catch (const HAL::detail::js_runtime_error& ex) { \
     Titanium::Module::ShowRedScreenOfDeath(CTX, ex); \
+} catch (const std::runtime_error& ex) { \
+    Titanium::Module::ShowRedScreenOfDeath(CTX, ex.what()); \
 } catch (...) { \
     Titanium::Module::ShowRedScreenOfDeath(CTX, "Unknown Exception"); \
 }
