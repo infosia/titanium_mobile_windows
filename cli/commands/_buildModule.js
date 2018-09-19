@@ -28,7 +28,8 @@ var archiver = require('archiver'),
 	typesMin = ['win10'],
 	configuration = 'Release',
 	EventEmitter = require('events').EventEmitter,
-	vs_architectures = {ARM:'ARM', x86:'Win32', ARM64:'ARM64', x64:'x64'}; // x86 -> Win32 mapping
+	vs_architectures = {ARM:'ARM', x86:'Win32', ARM64:'ARM64', x64:'x64'}, // x86 -> Win32 mapping
+	__ = appc.i18n(__dirname).__;
 
 function WindowsModuleBuilder() {
 	Builder.apply(this, arguments);
