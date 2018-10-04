@@ -167,7 +167,6 @@ namespace TitaniumWindows
 				}
 			});
 		}
-
 	}
 
 	std::shared_ptr<Titanium::Media::Item> getMediaItem(const JSContext& js_context, StorageFile^ file) 
@@ -572,27 +571,51 @@ namespace TitaniumWindows
 	{
 		const auto cameraCaptureUI = ref new CameraCaptureUI();
 
-		// TODO: Provide a option to specify aspect ratio
-		cameraCaptureUI->PhotoSettings->CroppedAspectRatio = Size(16, 9);
+		const auto isVideoSelected = std::find(options.mediaTypes.begin(), options.mediaTypes.end(), Titanium::Media::MediaType::Video) != options.mediaTypes.end();
+		CameraCaptureUIMode captureMode;
+
+		if (isVideoSelected) {
+			// Setup video settings
+			cameraCaptureUI->VideoSettings->Format = CameraCaptureUIVideoFormat::Mp4;
+			if (options.videoMaximumDuration.count() > 0) {
+				cameraCaptureUI->VideoSettings->MaxDurationInSeconds = static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(options.videoMaximumDuration).count());
+			}
+			if (options.videoQuality == Titanium::Media::Quality::High) {
+				cameraCaptureUI->VideoSettings->MaxResolution = CameraCaptureUIMaxVideoResolution::HighDefinition;
+			} else if (options.videoQuality == Titanium::Media::Quality::Medium) {
+				cameraCaptureUI->VideoSettings->MaxResolution = CameraCaptureUIMaxVideoResolution::StandardDefinition;
+			} else if (options.videoQuality == Titanium::Media::Quality::Low) {
+				cameraCaptureUI->VideoSettings->MaxResolution = CameraCaptureUIMaxVideoResolution::LowDefinition;
+			}
+			captureMode = CameraCaptureUIMode::Video;
+		} else {
+			if (options.photoAspectRatio.width > 0 && options.photoAspectRatio.height > 0) {
+				cameraCaptureUI->PhotoSettings->CroppedAspectRatio = Size(static_cast<float>(options.photoAspectRatio.width), static_cast<float>(options.photoAspectRatio.height));
+			} else {
+				cameraCaptureUI->PhotoSettings->CroppedAspectRatio = Size(4, 3);
+			}
+			captureMode = CameraCaptureUIMode::Photo;
+		}
 
 		// CameraCaptureUI is ready
 		fireEvent("cameraready");
-
-		concurrency::create_task(cameraCaptureUI->CaptureFileAsync(CameraCaptureUIMode::Photo)).then([options, this](concurrency::task<StorageFile^> task) {
+		concurrency::create_task(cameraCaptureUI->CaptureFileAsync(captureMode)).then([options, isVideoSelected, this](concurrency::task<StorageFile^> task) {
 			try {
 				auto fromFile = task.get();
 				if (fromFile != nullptr) {
 					if (options.saveToPhotoGallery) {
-						// CameraCaptureUI saves picture into temporary folder. Let's move it to photo library then.
-						concurrency::task<StorageFile^>(KnownFolders::CameraRoll->CreateFileAsync("TiMediaPhoto.jpg", CreationCollisionOption::GenerateUniqueName))
-							.then([fromFile, options](concurrency::task<Windows::Storage::StorageFile^> task) {
+						const auto createFile = isVideoSelected ? 
+							KnownFolders::VideosLibrary->CreateFileAsync("TiMediaVideo.mp4", CreationCollisionOption::GenerateUniqueName) : 
+							KnownFolders::CameraRoll->CreateFileAsync("TiMediaPhoto.jpg", CreationCollisionOption::GenerateUniqueName);
+						// CameraCaptureUI saves video/picture into temporary folder. Let's move it to video/photo library then.
+						concurrency::task<StorageFile^>(createFile).then([fromFile, isVideoSelected, options](concurrency::task<Windows::Storage::StorageFile^> task) {
 							try {
 								auto toFile = task.get();
-								concurrency::create_task(fromFile->MoveAndReplaceAsync(toFile)).then([toFile, options](concurrency::task<void> task) {
+								concurrency::create_task(fromFile->MoveAndReplaceAsync(toFile)).then([toFile, isVideoSelected, options](concurrency::task<void> task) {
 									try {
 										task.get();
 										Titanium::Media::CameraMediaItemType item;
-										item.mediaType = Titanium::Media::MediaType::Photo;
+										item.mediaType = isVideoSelected ? Titanium::Media::MediaType::Video : Titanium::Media::MediaType::Photo;
 										item.media_filename = TitaniumWindows::Utility::ConvertString(toFile->Path);
 										options.callbacks.onsuccess(item);
 									} catch (Platform::Exception^ e) {
@@ -613,13 +636,14 @@ namespace TitaniumWindows
 						});
 					} else {
 						Titanium::Media::CameraMediaItemType item;
-						item.mediaType = Titanium::Media::MediaType::Photo;
-						item.media_filename = TitaniumWindows::Utility::ConvertString(fromFile->Path);
+						item.mediaType = isVideoSelected ? Titanium::Media::MediaType::Video : Titanium::Media::MediaType::Photo;
+						item.media_filename = TitaniumWindows::Utility::ConvertUTF8String(fromFile->Path);
 						options.callbacks.onsuccess(item);
 					}
 				} else {
-					GENERATE_TI_ERROR_RESPONSE("Failed to capture photo", error);
-					options.callbacks.onerror(error);
+					// This indicates camera capture is cancelled
+					GENERATE_TI_ERROR_RESPONSE("Camera capture is canceled", error);
+					options.callbacks.oncancel(error);
 				}
 			} catch (Platform::Exception^ e) {
 				GENERATE_TI_ERROR_RESPONSE(TitaniumWindows::Utility::ConvertString(e->Message), error);
@@ -675,7 +699,7 @@ namespace TitaniumWindows
 	void MediaModule::showCamera(const Titanium::Media::CameraOptionsType& options) TITANIUM_NOEXCEPT
 	{
 		cameraOptionsState__ = options;
-		// If there's no overlay on Windows 10 (Mobile), let's use CameraCaptureUI.
+		// If There's no overlay on Windows 10 (Mobile), let's use CameraCaptureUI.
 		if (options.overlay == nullptr) {
 			showDefaultCamera(options);
 			return;
@@ -686,12 +710,16 @@ namespace TitaniumWindows
 			return;
 		}
 
+		const auto isVideoSelected = std::find(options.mediaTypes.begin(), options.mediaTypes.end(), Titanium::Media::MediaType::Video) != options.mediaTypes.end();
+
 		mediaCapture__ = ref new MediaCapture();
 		auto settings = ref new MediaCaptureInitializationSettings();
 		// If not capturing video, don't require audio. This way we don't need "microphone" capability to take a picture
-		if (std::find(options.mediaTypes.begin(), options.mediaTypes.end(), Titanium::Media::MediaType::Video) == options.mediaTypes.end()) {
+		if (!isVideoSelected) {
 			settings->AudioDeviceId = "";
 			settings->StreamingCaptureMode = StreamingCaptureMode::Video;
+		} else {
+			settings->StreamingCaptureMode = StreamingCaptureMode::AudioAndVideo;
 		}
 
 		// Indicate if front camera is selected
@@ -702,7 +730,7 @@ namespace TitaniumWindows
 		for (auto camera : cameraDevices__) {
 			const auto name = TitaniumWindows::Utility::ConvertString(camera->Name);
 			const auto isFrontCamera = name.find("Front") != std::string::npos;
-			const auto isBackCamera = name.find("Back") != std::string::npos;
+			const auto isBackCamera = (name.find("Back") != std::string::npos) || (name.find("Rear") != std::string::npos);
 
 			if ((options.whichCamera == Titanium::Media::CameraOption::Front && isFrontCamera) ||
 				(options.whichCamera == Titanium::Media::CameraOption::Rear && isBackCamera)) {
@@ -764,8 +792,6 @@ namespace TitaniumWindows
 
 				concurrency::create_task(mediaCapture->StartPreviewAsync()).then([options, this](concurrency::task<void> previewTask) {
 					try {
-						const auto mediaCapture = mediaCapture__.Get();
-
 						updatePreviewOrientation();
 
 						previewTask.get();
