@@ -66,9 +66,11 @@ namespace TitaniumWindows
 		WindowsViewLayoutDelegate::WindowsViewLayoutDelegate() TITANIUM_NOEXCEPT
 			: ViewLayoutDelegate()
 		{
-			TITANIUM_LOG_DEBUG("WindowsViewLayoutDelegate::ctor ", this);
 			// Update physical pixels factor for the current display information
-			Titanium::LayoutEngine::PhysicalPixelsFactor = Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->RawPixelsPerViewPixel;
+			static std::once_flag of;
+			std::call_once(of, []() {
+				Titanium::LayoutEngine::PhysicalPixelsFactor = Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->RawPixelsPerViewPixel;
+			});
 		}
 
 		WindowsViewLayoutDelegate::~WindowsViewLayoutDelegate() TITANIUM_NOEXCEPT
@@ -1549,9 +1551,6 @@ namespace TitaniumWindows
 			const auto view = static_cast<WindowsViewLayoutDelegate*>(node->data);
 			auto rect = Titanium::LayoutEngine::RectMake(node->element.measuredLeft, node->element.measuredTop, node->element.measuredWidth, node->element.measuredHeight);
 			view->onLayoutEngineCallback(rect, node->name);
-
-			// update gradient when needed
-			view->updateBackgroundGradient();
 		}
 
 		void WindowsViewLayoutDelegate::setDefaultBackground()
@@ -1728,12 +1727,18 @@ namespace TitaniumWindows
 		void WindowsViewLayoutDelegate::onLayoutEngineCallback(Titanium::LayoutEngine::Rect rect, const std::string& name)
 		{
 			if (parent__) {
-				auto event_delegate = event_delegate__.lock();
-				TITANIUM_ASSERT(event_delegate != nullptr);
-				std::string defaultunit = ViewLayoutDelegate::GetDefaultUnit(event_delegate->get_context());
+
+				static double ppi;
+				static std::string defaultunit;
+				static std::once_flag of;
+				std::call_once(of, [=]() {
+					const auto event_delegate = event_delegate__.lock();
+					TITANIUM_ASSERT(event_delegate != nullptr);
+					defaultunit = ViewLayoutDelegate::GetDefaultUnit(event_delegate->get_context());
+					ppi = ComputePPI(Titanium::LayoutEngine::ValueName::Width);
+				});
 
 				const auto p_border = parent__->getViewLayoutDelegate()->get_borderWidth();
-				const auto ppi = ComputePPI(Titanium::LayoutEngine::ValueName::Width);
 				rect.x -= Titanium::LayoutEngine::parseUnitValue(p_border, Titanium::LayoutEngine::ValueType::Fixed, ppi, defaultunit);
 				rect.y -= Titanium::LayoutEngine::parseUnitValue(p_border, Titanium::LayoutEngine::ValueType::Fixed, ppi, defaultunit);
 			}
@@ -1822,6 +1827,9 @@ namespace TitaniumWindows
 			}
 
 			oldRect__ = Titanium::LayoutEngine::RectMake(rect.x, rect.y, rect.width, rect.height);
+
+			// update gradient when needed
+			updateBackgroundGradient();
 		}
 
 		void WindowsViewLayoutDelegate::requestLayout(const bool& fire_event)
@@ -1982,7 +1990,6 @@ namespace TitaniumWindows
 				prop.value = "UI.FILL";
 			}
 
-			auto info = Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
 			double ppi = ComputePPI(name);
 
 			// Get the default unit from ti.ui.defaultUnit
