@@ -87,7 +87,6 @@ if (NOT TARGET HAL)
 endif()
 
 list(INSERT CMAKE_MODULE_PATH 0 ${Ti_CMAKE_MODULE_DIR})
-find_package(JavaScriptCore REQUIRED)
 
 # No user-servicable parts below this line.
 
@@ -120,8 +119,6 @@ set_property(SOURCE ${SOURCE_analytics} PROPERTY VS_DEPLOYMENT_CONTENT 1)
 set_property(SOURCE ${SOURCE_analytics} PROPERTY VS_DEPLOYMENT_LOCATION "analytics")
 set(SOURCE_src_Assets
   ${CMAKE_CURRENT_BINARY_DIR}/${APP_MANIFEST_NAME}
-  ${JavaScriptCore_LIBRARY_DIR}/Release/JavaScriptCore.dll
-  ${JavaScriptCore_LIBRARY_DIR}/Release/WTF.dll
   "src/Assets/app.js"
   "src/Assets/console.test.js"
   "src/Assets/error.test.js"
