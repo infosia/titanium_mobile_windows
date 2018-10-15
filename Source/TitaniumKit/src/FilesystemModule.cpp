@@ -95,7 +95,7 @@ namespace Titanium
 		"       var dir  = Ti.Filesystem.createTempDirectory();"
 		"       var file = Ti.Filesystem.getFile(dir.nativePath, 'tifile' + Math.random().toString(36).substring(2) + '.tmp');"
 		"       file.createFile();"
-		"       retrun file;"
+		"       return file;"
 		"})(this)";
 		auto file = js_context.JSEvaluateScript(script);
 		assert(file.IsObject());

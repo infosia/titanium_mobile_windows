@@ -307,7 +307,7 @@ namespace Titanium
 		JSExport<Module>::SetClassVersion(1);
 		JSExport<Module>::SetParent(JSExport<JSExportObject>::Class());
 		TITANIUM_ADD_PROPERTY(Module, bubbleParent);
-		TITANIUM_ADD_PROPERTY_READONLY(Module, apiName);
+		TITANIUM_ADD_CONSTANT_PROPERTY(Module, apiName);
 		TITANIUM_ADD_PROPERTY(Module, lifecycleContainer);
 
 		TITANIUM_ADD_FUNCTION(Module, addEventListener);
