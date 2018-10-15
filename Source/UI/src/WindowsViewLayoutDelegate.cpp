@@ -1942,8 +1942,7 @@ namespace TitaniumWindows
 
 		double WindowsViewLayoutDelegate::ComputePPI(const Titanium::LayoutEngine::ValueName& name)
 		{
-			static float LogicalDpi;
-			static float RawDpiX, RawDpiY;
+			static float LogicalDpi, RawDpiX, RawDpiY;
 			static double RawPixelsPerViewPixel;
 			static std::once_flag of;
 			std::call_once(of, [=]() {
@@ -1956,7 +1955,6 @@ namespace TitaniumWindows
 			});
 
 			double ppi = LogicalDpi;
-#if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)
 			switch (name) {
 			case Titanium::LayoutEngine::ValueName::CenterX:
 			case Titanium::LayoutEngine::ValueName::Left:
@@ -1973,7 +1971,6 @@ namespace TitaniumWindows
 				ppi = RawDpiY / RawPixelsPerViewPixel;
 				break;
 			}
-#endif
 			return ppi;
 		}
 
