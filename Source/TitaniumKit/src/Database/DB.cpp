@@ -171,7 +171,7 @@ namespace Titanium
 			// Now let's wrap the results in our ResultSet proxy
 			// FIXME Pass these values into the constructor, don't expose the fields
 			// How would we pass along the statement pointer?
-			const auto resultSet_object = get_context().CreateObject(JSExport<Titanium::Database::ResultSet>::Class());
+			const auto resultSet_object = get_context().CreateObject(JSExport<Titanium::Database::ResultSet>::Class()).CallAsConstructor();
 			const auto resultSet = resultSet_object.GetPrivate<Titanium::Database::ResultSet>();
 			assert(resultSet);
 			resultSet->setDatabase(this);

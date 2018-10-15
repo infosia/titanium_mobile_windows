@@ -17,7 +17,6 @@
 namespace Titanium
 {
 	static const std::string ti_db_js = R"TI_DB_JS(
-	var self = this;
 	this.exports = {};
 	this.exports.install = function(dbResourceFilePath,dbName) {
 		var dbResourceFile = Ti.Filesystem.getFile(dbResourceFilePath);
@@ -31,7 +30,7 @@ namespace Titanium
 		if ((!dbFile.exists() || dbFile.size == 0) && dbResourceFile.exists()) {
 			dbResourceFile.copy(dbFilePath);
 		}
-		return self.TiDatabase.open(dbName);
+		return Titanium.Database.open(dbName);
 	};
 	this.exports.open = function(dbName) {
 		var dbDirPath = Ti.Filesystem.applicationDataDirectory + Ti.Filesystem.separator + "databases";
@@ -40,7 +39,7 @@ namespace Titanium
 			dbDir.createDirectory();
 		}
 		var dbFilePath = dbDirPath + Ti.Filesystem.separator + dbName;
-		var db = new self.TiDatabaseDB(dbName, dbFilePath);
+		var db = Titanium.Database.createDB(dbName, dbFilePath);
 		return db;
 	};
 	)TI_DB_JS";
@@ -96,9 +95,6 @@ namespace Titanium
 
 		auto export_object = js_context.CreateObject();
 		export_object.SetProperty("global", js_context.get_global_object());
-		export_object.SetProperty("TiDatabase", js_context.CreateObject(JSExport<Titanium::DatabaseModule>::Class()));
-		export_object.SetProperty("TiDatabaseDB", js_context.CreateObject(JSExport<Titanium::Database::DB>::Class()));
-		export_object.SetProperty("TiDatabaseResultSet", js_context.CreateObject(JSExport<Titanium::Database::ResultSet>::Class()));
 
 		js_context.JSEvaluateScript(ti_db_js, export_object);
 		if (export_object.HasProperty("exports")) {
@@ -115,6 +111,7 @@ namespace Titanium
 		JSExport<DatabaseModule>::SetParent(JSExport<Module>::Class());
 		TITANIUM_ADD_FUNCTION(DatabaseModule, install);
 		TITANIUM_ADD_FUNCTION(DatabaseModule, open);
+		TITANIUM_ADD_FUNCTION(DatabaseModule, createDB);
 		TITANIUM_ADD_PROPERTY_READONLY(DatabaseModule, FIELD_TYPE_DOUBLE);
 		TITANIUM_ADD_PROPERTY_READONLY(DatabaseModule, FIELD_TYPE_FLOAT);
 		TITANIUM_ADD_PROPERTY_READONLY(DatabaseModule, FIELD_TYPE_INT);
@@ -146,6 +143,12 @@ namespace Titanium
 			TITANIUM_LOG_ERROR("Failed to execute Database.install");
 			return js_context.CreateNull();
 		}
+	}
+
+	TITANIUM_FUNCTION(DatabaseModule, createDB)
+	{
+		const auto js_context = this_object.get_context();
+		return js_context.CreateObject(JSExport<Titanium::Database::DB>::Class()).CallAsConstructor(arguments);
 	}
 
 	TITANIUM_FUNCTION(DatabaseModule, open)

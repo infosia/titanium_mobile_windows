@@ -30,6 +30,8 @@ namespace Titanium
 		TITANIUM_PROPERTY_READONLY_DEF(FIELD_TYPE_INT);
 		TITANIUM_PROPERTY_READONLY_DEF(FIELD_TYPE_STRING);
 
+		TITANIUM_FUNCTION_DEF(createDB);
+
 		DatabaseModule(const JSContext&) TITANIUM_NOEXCEPT;
 		virtual void postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) override;
 
