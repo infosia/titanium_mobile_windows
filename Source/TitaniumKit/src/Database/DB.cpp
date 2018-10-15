@@ -173,6 +173,7 @@ namespace Titanium
 			// How would we pass along the statement pointer?
 			const auto resultSet_object = get_context().CreateObject(JSExport<Titanium::Database::ResultSet>::Class());
 			const auto resultSet = resultSet_object.GetPrivate<Titanium::Database::ResultSet>();
+			assert(resultSet);
 			resultSet->setDatabase(this);
 			const auto insert_result = resultSets__.emplace(statement, resultSet);
 			TITANIUM_ASSERT(insert_result.second);

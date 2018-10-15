@@ -65,11 +65,11 @@ namespace Titanium
 	JSObject Stream::createPromisifyFunction(const JSContext& js_context) TITANIUM_NOEXCEPT
 	{
 		const std::string script = R"JS(
-			function(callback) {
+			(function(callback) {
 				return function(value) {
 					new Promise(function(resolve){ resolve(value); }).then(callback);
 				};
-			}
+			})
 		)JS";
 		return static_cast<JSObject>(js_context.JSEvaluateScript(script));
 	}
