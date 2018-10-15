@@ -242,6 +242,7 @@ namespace Titanium
 		read_buffer->set_length(maxChunkSize);
 
 		const auto callback = [this, read_buffer, handler, inputStream](const ErrorResponse& error, const std::int32_t& bytesRead) {
+			TITANIUM_EXCEPTION_CATCH_START{
 			if (bytesRead > 0) {
 				// callback
 				JSObject e = get_context().CreateObject();
@@ -256,6 +257,7 @@ namespace Titanium
 				const std::vector<JSValue> args { e };
 				static_cast<JSObject>(handler)(args, get_object());
 			}
+			} TITANIUM_EXCEPTION_CATCH_END
 		};
 
 		if (isAsync) {
