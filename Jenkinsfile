@@ -183,7 +183,7 @@ timestamps {
 			},
 			'Windows 10 x64': {
 				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && jsc') {
-					build('10.0', '14.0', 'WindowsStore-x64', gitCommit, nodeVersion, npmVersion)
+					build('14.0', 'WindowsStore-x64', gitCommit, nodeVersion, npmVersion)
 				}
 			},
 			failFast: true
