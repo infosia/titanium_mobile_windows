@@ -72,10 +72,10 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion, npmVersion, targetAr
 			dir('scripts') {
 				try {
 					timeout(30) {
-						if ('ws-local'.equals(target)) {
-							bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
-						} else if ('ws-local'.equals(target) && 'x64'.equals(targetArch)) {
+						if ('ws-local'.equals(target) && 'x64'.equals(targetArch)) {
 							bat "node test.js -p windows -T ${target} -a x64 --skip-sdk-install --cleanup"
+						} else if ('ws-local'.equals(target)) {
+							bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
 						} else if ('wp-emulator'.equals(target)) {
 							bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
 						}
