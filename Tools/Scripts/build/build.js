@@ -33,7 +33,7 @@ const DIST_LIB_DIR = path.join(DIST_DIR, 'lib');
  * @param {String} buildType 'Release' || 'Debug'
  * @param {String} msBuildVersion '14.0' || '15.0'
  * @param {String} platform 'WindowsPhone' || 'WindowsStore'
- * @param {String} arch 'x86' || 'ARM'
+ * @param {String} arch 'x86' || 'ARM' || 'x64'
  * @param {Boolean} parallel should we run MSBuild in parallel?
  * @param {Boolean} quiet log stdout of processes?
  * @return {Promise}
@@ -95,7 +95,7 @@ async function updateBuildValuesInTitaniumModule(githash, tiModuleCPP) {
  * @param {String} buildType 'Release' || 'Debug'
  * @param {String} msBuildVersion '14.0' || '15.0'
  * @param {String} platform  'WindowsPhone' || 'WindowsStore'
- * @param {String} arch 'x86' || 'ARM'
+ * @param {String} arch 'x86' || 'ARM' || 'x64'
  * @param {Boolean} quiet log stdout of process?
  * @return {Promise}
  */
@@ -113,6 +113,8 @@ function runCMake(sourceDir, buildDir, buildType, msBuildVersion, platform, arch
 
 	if (arch === 'ARM') {
 		generator += ' ARM';
+	} else if ('x64' == arch) {
+		generator += ' Win64';
 	}
 
 	const args = [
@@ -151,7 +153,7 @@ function runNuGet(slnFile, quiet) {
  * @param {String} msBuildVersion The version of MSBuild to run: '14.0' || '15.0'
  * @param {String} slnFile The VS solution file to build.
  * @param {String} buildType 'Release' || 'Debug'
- * @param {String} arch 'x86' || 'ARM'
+ * @param {String} arch 'x86' || 'ARM' || 'x64'
  * @param {Boolean} parallel Run msbuild in parallel? (/m option)
  * @param {Boolean} quiet log stdout of process?
  * @return {Promise}
@@ -175,9 +177,16 @@ function runMSBuild(msBuildVersion, slnFile, buildType, arch, parallel, quiet) {
 				return reject('Unable to find a supported Visual Studio installation');
 			}
 
+			var msbuildPlatformParam = '';
+			if (arch == 'ARM') {
+				msbuildPlatformParam = ' /p:Platform=ARM';
+			} else if (arch == 'x64') {
+				msbuildPlatformParam = ' /p:Platform=x64';
+			}
+
 			// Use spawn directly so we can pipe output as we go
 			const p = spawn((process.env.comspec || 'cmd.exe'), [ '/S', '/C', '"', vsInfo.vsDevCmd.replace(/[ ()&]/g, '^$&')
-				+ ' && MSBuild' + (arch === 'ARM' ? ' /p:Platform=' + arch : '') + (parallel ? ' /m' : '') + ' /nr:false /p:Configuration=Release ' + slnFile, '"'
+				+ ' && MSBuild' + msbuildPlatformParam + (parallel ? ' /m' : '') + ' /nr:false /p:Configuration=Release ' + slnFile, '"'
 			], { windowsVerbatimArguments: true });
 
 			p.stdout.on('data', data => {
@@ -206,7 +215,7 @@ function runMSBuild(msBuildVersion, slnFile, buildType, arch, parallel, quiet) {
  * @param {String} destDir The top-level destination directory where we copy the built libraries
  * @param {String} buildType 'Release' || 'Debug'
  * @param {String} platformAbbrev 'phone' || 'store' || 'win10'
- * @param {String} arch 'x86' || 'ARM'
+ * @param {String} arch 'x86' || 'ARM' || 'x64'
  */
 function copyToDistribution(sourceDir, destDir, buildType, platformAbbrev, arch) {
 	const libs = {
@@ -287,7 +296,7 @@ function spawnWithArgs(name, file, args, options, quiet) {
  * @param {String} sha sha1 to use for Ti.buildHash, computed if not provided
  * @param {String} msBuildVersion '14.0' || '15.0'
  * @param {String} buildType 'Release' || 'Debug'
- * @param {string[]} targets (WindowsStore|WindowsPhone)-(ARM|x86)
+ * @param {string[]} targets (WindowsStore|WindowsPhone)-(ARM|x86|x64)
  * @param {Object} [options] options
  * @param {Boolean} [options.parallel] Run builds in parallel?
  * @param {Boolean} [options.quiet] Log stdout of processes?
@@ -301,12 +310,12 @@ async function build(sha, msBuildVersion, buildType, targets, options = {}) {
 
 	if (options.parallel) {
 		await Promise.all(targets.map(configuration => {
-			const parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86)
+			const parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86|x64)
 			return buildAndPackage(SOURCE_TITANIUM_DIR, BUILD_DIR, DIST_LIB_DIR, buildType, msBuildVersion, parts[0], parts[1], options.parallel, options.quiet);
 		}));
 	} else {
 		for (const configuration of targets) {
-			const parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86)
+			const parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86|x64)
 			await buildAndPackage(SOURCE_TITANIUM_DIR, BUILD_DIR, DIST_LIB_DIR, buildType, msBuildVersion, parts[0], parts[1], options.parallel, options.quiet);
 		}
 	}
@@ -318,7 +327,7 @@ async function build(sha, msBuildVersion, buildType, targets, options = {}) {
 
 	// copy JavaScriptCore
 	for (const configuration of targets) {
-		const parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86)
+		const parts = configuration.split('-'); // target platform(WindowsStore|WindowsPhone)-arch(ARM|x86|x64)
 		console.log(`Copying JavaScriptCore for ${parts[1]}...`);
 		const newDir = path.join(DIST_LIB_DIR, 'JavaScriptCore', 'win10', parts[1]);
 		const fromDir = path.join(process.env.JavaScriptCore_HOME, parts[1]);
@@ -376,7 +385,7 @@ if (module.id === '.') {
 		const arches = [ 'WindowsPhone-x86', 'WindowsPhone-ARM', 'WindowsStore-x86' ];
 
 		function collectArches(val, memo) {
-			const m = /^Windows(Store|Phone)-(x86|ARM)$/.exec(val);
+			const m = /^Windows(Store|Phone)-(x86|ARM|x64)$/.exec(val);
 			if (m) {
 				memo.push(val);
 			}
