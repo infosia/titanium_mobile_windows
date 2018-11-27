@@ -113,7 +113,7 @@ function runCMake(sourceDir, buildDir, buildType, msBuildVersion, platform, arch
 
 	if (arch === 'ARM') {
 		generator += ' ARM';
-	} else if ('x64' == arch) {
+	} else if (arch === 'x64') {
 		generator += ' Win64';
 	}
 
@@ -178,9 +178,9 @@ function runMSBuild(msBuildVersion, slnFile, buildType, arch, parallel, quiet) {
 			}
 
 			var msbuildPlatformParam = '';
-			if (arch == 'ARM') {
+			if (arch === 'ARM') {
 				msbuildPlatformParam = ' /p:Platform=ARM';
-			} else if (arch == 'x64') {
+			} else if (arch === 'x64') {
 				msbuildPlatformParam = ' /p:Platform=x64';
 			}
 

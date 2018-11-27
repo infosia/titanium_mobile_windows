@@ -45,10 +45,10 @@ function generateProject(example_name, dest, platform, sdkVersion, msdev, arch) 
 		let generator = (msdev === MSBUILD_14) ? VS_2015_GENERATOR : VS_2017_GENERATOR;
 		if (arch === 'ARM') {
 			generator += ' ARM';
-		} else if (arch == 'ARM64') {
+		} else if (arch === 'ARM64') {
 			generator += ' ARM64';
-		} else if (arch == 'x64') {
-			generator += ' Win64'
+		} else if (arch === 'x64') {
+			generator += ' Win64';
 		}
 
 		// Make sure our intended output dir exists!
