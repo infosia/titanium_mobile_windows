@@ -1650,6 +1650,7 @@ namespace Titanium
 			std::call_once(of, []() {
       map["cm"]  = UNIT::Cm;
       map["dip"] = UNIT::Dip;
+      map["dp"]  = UNIT::Dip;
       map["in"]  = UNIT::In;
       map["mm"]  = UNIT::Mm;
       map["px"]  = UNIT::Px;
