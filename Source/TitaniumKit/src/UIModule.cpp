@@ -11,6 +11,7 @@
 #include "Titanium/UI/Tab.hpp"
 #include "Titanium/UI/Window.hpp"
 #include "Titanium/detail/TiImpl.hpp"
+#include "Titanium/UI/NavigationWindow.hpp"
 #include <sstream>
 
 #define CREATE_TITANIUM_UI(NAME) \
@@ -32,6 +33,7 @@ namespace Titanium
 
 	UIModule::UIModule(const JSContext& js_context) TITANIUM_NOEXCEPT
 	    : Module(js_context, "Ti.UI")
+		, navigationWindow__(JSExport<Titanium::UI::NavigationWindow>::Class())
 	{
 		TITANIUM_LOG_DEBUG("UIModule:: ctor ", this);
 	}
@@ -162,47 +164,43 @@ namespace Titanium
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::INPUT_BUTTONMODE::ONFOCUS));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_APPEARANCE_ALERT)
-	{
-		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD_APPEARANCE::ALERT));
-	}
 	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_APPEARANCE_DEFAULT)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD_APPEARANCE::DEFAULT));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_ASCII)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_ASCII)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::ASCII));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_DECIMAL_PAD)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_DECIMAL_PAD)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::DECIMAL_PAD));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_DEFAULT)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_DEFAULT)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::DEFAULT));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_EMAIL)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_EMAIL)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::EMAIL));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_NAMEPHONE_PAD)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_NAMEPHONE_PAD)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::NAMEPHONE_PAD));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_NUMBERS_PUNCTUATION)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_NUMBERS_PUNCTUATION)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::NUMBERS_PUNCTUATION));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_NUMBER_PAD)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_NUMBER_PAD)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::NUMBER_PAD));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_PHONE_PAD)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_PHONE_PAD)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::PHONE_PAD));
 	}
-	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_URL)
+	TITANIUM_PROPERTY_GETTER(UIModule, KEYBOARD_TYPE_URL)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::KEYBOARD::URL));
 	}
@@ -634,6 +632,9 @@ namespace Titanium
 		JSExport<UIModule>::SetParent(JSExport<Module>::Class());
 
 		TITANIUM_ADD_FUNCTION(UIModule, create2DMatrix);
+		TITANIUM_ADD_FUNCTION(UIModule, create3DMatrix);
+		TITANIUM_ADD_FUNCTION(UIModule, createMatrix2D);
+		TITANIUM_ADD_FUNCTION(UIModule, createMatrix3D);
 		TITANIUM_ADD_FUNCTION(UIModule, createActivityIndicator);
 		TITANIUM_ADD_FUNCTION(UIModule, createAnimation);
 		TITANIUM_ADD_FUNCTION(UIModule, createAlertDialog);
@@ -645,6 +646,7 @@ namespace Titanium
 		TITANIUM_ADD_FUNCTION(UIModule, createListItem);
 		TITANIUM_ADD_FUNCTION(UIModule, createListSection);
 		TITANIUM_ADD_FUNCTION(UIModule, createListView);
+		TITANIUM_ADD_FUNCTION(UIModule, createNavigationWindow);
 		TITANIUM_ADD_FUNCTION(UIModule, createNotification);
 		TITANIUM_ADD_FUNCTION(UIModule, createOptionDialog);
 		TITANIUM_ADD_FUNCTION(UIModule, createPicker);
@@ -704,17 +706,16 @@ namespace Titanium
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, INPUT_BUTTONMODE_NEVER);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, INPUT_BUTTONMODE_ONBLUR);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, INPUT_BUTTONMODE_ONFOCUS);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_APPEARANCE_ALERT);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_APPEARANCE_DEFAULT);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_ASCII);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_DECIMAL_PAD);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_DEFAULT);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_EMAIL);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_NAMEPHONE_PAD);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_NUMBERS_PUNCTUATION);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_NUMBER_PAD);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_PHONE_PAD);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_URL);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_ASCII);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_DECIMAL_PAD);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_DEFAULT);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_EMAIL);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_NAMEPHONE_PAD);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_NUMBERS_PUNCTUATION);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_NUMBER_PAD);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_PHONE_PAD);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, KEYBOARD_TYPE_URL);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, LANDSCAPE_LEFT);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, LANDSCAPE_RIGHT);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, LIST_ACCESSORY_TYPE_CHECKMARK);
@@ -820,7 +821,8 @@ namespace Titanium
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, ATTRIBUTE_LINE_BREAK_BY_TRUNCATING_HEAD);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, ATTRIBUTE_LINE_BREAK_BY_TRUNCATING_TAIL);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, ATTRIBUTE_LINE_BREAK_BY_TRUNCATING_MIDDLE);
-		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, 2DMatrix);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, Matrix2D);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, Matrix3D);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, ActivityIndicator);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, ActivityIndicatorStyle);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, AlertDialog);
@@ -833,6 +835,7 @@ namespace Titanium
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, Label);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, ListView);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, ListSection);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, NavigationWindow);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, Notification);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, OptionDialog);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, ProgressBar);
@@ -856,9 +859,14 @@ namespace Titanium
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, Window);
 	}
 
-	TITANIUM_PROPERTY_GETTER(UIModule, 2DMatrix)
+	TITANIUM_PROPERTY_GETTER(UIModule, Matrix2D)
 	{
-		return get_context().CreateObject(twodmatrix__);
+		return get_context().CreateObject(matrix2d__);
+	}
+
+	TITANIUM_PROPERTY_GETTER(UIModule, Matrix3D)
+	{
+		return get_context().CreateObject(matrix3d__);
 	}
 
 	TITANIUM_PROPERTY_GETTER(UIModule, ActivityIndicator)
@@ -919,6 +927,11 @@ namespace Titanium
 	TITANIUM_PROPERTY_GETTER(UIModule, ListSection)
 	{
 		return get_context().CreateObject(listsection__);
+	}
+
+	TITANIUM_PROPERTY_GETTER(UIModule, NavigationWindow)
+	{
+		return get_context().CreateObject(navigationWindow__);
 	}
 
 	TITANIUM_PROPERTY_GETTER(UIModule, Notification)
@@ -1028,21 +1041,28 @@ namespace Titanium
 
 	TITANIUM_FUNCTION(UIModule, create2DMatrix)
 	{
+		get_context().JSEvaluateScript("Ti.API.warn('Ti.UI.create2DMatrix DEPRECATED in 8.0.0, in favor of Ti.UI.createMatrix2D');");
 		ENSURE_OPTIONAL_OBJECT_AT_INDEX(parameters, 0);
+		CREATE_TITANIUM_UI(Matrix2D);
+	}
 
-		// FIXME Macros didn't work because identifiers can't start with digits!
-		JSValue Titanium_property = this_object.get_context().get_global_object().GetProperty("Titanium");
-		TITANIUM_ASSERT(Titanium_property.IsObject());
-		JSObject Titanium = static_cast<JSObject>(Titanium_property);
-		JSValue UI_property = Titanium.GetProperty("UI");
-		TITANIUM_ASSERT(UI_property.IsObject());
-		JSObject UI = static_cast<JSObject>(UI_property);
-		JSValue TwoDMatrix_property = UI.GetProperty("2DMatrix");
-		TITANIUM_ASSERT(TwoDMatrix_property.IsObject());
-		JSObject TwoDMatrix = static_cast<JSObject>(TwoDMatrix_property);
-		auto TwoDMatrix_obj = TwoDMatrix.CallAsConstructor(parameters);
-		Titanium::Module::applyProperties(parameters, TwoDMatrix_obj);
-		return TwoDMatrix_obj;
+	TITANIUM_FUNCTION(UIModule, create3DMatrix)
+	{
+		get_context().JSEvaluateScript("Ti.API.warn('Ti.UI.create3DMatrix DEPRECATED in 8.0.0, in favor of Ti.UI.createMatrix3D');");
+		ENSURE_OPTIONAL_OBJECT_AT_INDEX(parameters, 0);
+		CREATE_TITANIUM_UI(Matrix3D);
+	}
+
+	TITANIUM_FUNCTION(UIModule, createMatrix2D)
+	{
+		ENSURE_OPTIONAL_OBJECT_AT_INDEX(parameters, 0);
+		CREATE_TITANIUM_UI(Matrix2D);
+	}
+
+	TITANIUM_FUNCTION(UIModule, createMatrix3D)
+	{
+		ENSURE_OPTIONAL_OBJECT_AT_INDEX(parameters, 0);
+		CREATE_TITANIUM_UI(Matrix3D);
 	}
 
 	TITANIUM_FUNCTION(UIModule, createActivityIndicator)
@@ -1109,6 +1129,12 @@ namespace Titanium
 	{
 		ENSURE_OPTIONAL_OBJECT_AT_INDEX(parameters, 0);
 		CREATE_TITANIUM_UI(ListView);
+	}
+
+	TITANIUM_FUNCTION(UIModule, createNavigationWindow)
+	{
+		ENSURE_OPTIONAL_OBJECT_AT_INDEX(parameters, 0);
+		CREATE_TITANIUM_UI(NavigationWindow);
 	}
 
 	TITANIUM_FUNCTION(UIModule, createNotification)
@@ -1317,9 +1343,21 @@ namespace Titanium
 		return *this;
 	}
 
-	UIModule& UIModule::TwoDMatrixClass(const JSClass& TwoDMatrix) TITANIUM_NOEXCEPT
+	UIModule& UIModule::Matrix2DClass(const JSClass& Matrix2D) TITANIUM_NOEXCEPT
 	{
-		twodmatrix__ = TwoDMatrix;
+		matrix2d__ = Matrix2D;
+		return *this;
+	}
+
+	UIModule& UIModule::Matrix3DClass(const JSClass& Matrix3D) TITANIUM_NOEXCEPT
+	{
+		matrix3d__ = Matrix3D;
+		return *this;
+	}
+
+	UIModule& UIModule::NavigationWindowClass(const JSClass& NavigationWindow) TITANIUM_NOEXCEPT
+	{
+		navigationWindow__ = NavigationWindow;
 		return *this;
 	}
 
