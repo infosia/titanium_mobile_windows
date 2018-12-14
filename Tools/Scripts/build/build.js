@@ -48,7 +48,7 @@ async function buildAndPackage(sourceDir, buildDir, destDir, buildType, msBuildV
 	await runCMake(sourceDir, archDir, buildType, msBuildVersion, platform, arch, quiet);
 	await runNuGet(slnFile, quiet);
 	await runMSBuild(msBuildVersion, slnFile, buildType, arch, parallel, quiet);
-	copyToDistribution(buildDir, destDir, buildType, platformAbbrev, arch);
+	await copyToDistribution(buildDir, destDir, buildType, platformAbbrev, arch);
 
 	// Wipe the build dir if everything went well. Don't remove top-level build root, because previous build steps may have added results we care about there (i.e. CTest)
 	await fs.remove(archDir);
@@ -99,17 +99,18 @@ async function updateBuildValuesInTitaniumModule(githash, tiModuleCPP) {
  * @param {Boolean} quiet log stdout of process?
  * @return {Promise}
  */
-function runCMake(sourceDir, buildDir, buildType, msBuildVersion, platform, arch, quiet) {
+async function runCMake(sourceDir, buildDir, buildType, msBuildVersion, platform, arch, quiet) {
 	let generator = VS_2015_GENERATOR;
 	if (msBuildVersion === MSBUILD_15) {
 		generator = VS_2017_GENERATOR;
 	}
 
 	// If the buildDir already exists, wipe it
-	if (fs.existsSync(buildDir)) {
-		fs.removeSync(buildDir);
+	const exists = await fs.pathExists(buildDir);
+	if (exists) {
+		await fs.remove(buildDir);
 	}
-	fs.ensureDirSync(buildDir);
+	await fs.ensureDir(buildDir);
 
 	if (arch === 'ARM') {
 		generator += ' ARM';
@@ -137,7 +138,7 @@ function runCMake(sourceDir, buildDir, buildType, msBuildVersion, platform, arch
 		sourceDir
 	];
 
-	return spawnWithArgs('CMake', CMAKE_BINARY, args, { cwd: buildDir }, quiet);
+	await spawnWithArgs('CMake', CMAKE_BINARY, args, { cwd: buildDir }, quiet);
 }
 
 /**
@@ -217,7 +218,7 @@ function runMSBuild(msBuildVersion, slnFile, buildType, arch, parallel, quiet) {
  * @param {String} platformAbbrev 'phone' || 'store' || 'win10'
  * @param {String} arch 'x86' || 'ARM' || 'x64'
  */
-function copyToDistribution(sourceDir, destDir, buildType, platformAbbrev, arch) {
+async function copyToDistribution(sourceDir, destDir, buildType, platformAbbrev, arch) {
 	const libs = {
 		// Library full name : output location
 		TitaniumWindows_Sensors: 'Sensors',
@@ -247,20 +248,21 @@ function copyToDistribution(sourceDir, destDir, buildType, platformAbbrev, arch)
 		const libDestDir = path.join(destDir, lib, platformAbbrev, arch);
 
 		// Make the destination folder
-		if (fs.existsSync(libDestDir)) {
-			fs.removeSync(libDestDir);
+		const exists = await fs.pathExists(libDestDir);
+		if (exists) {
+			await fs.remove(libDestDir);
 		}
-		fs.ensureDirSync(libDestDir);
+		await fs.ensureDir(libDestDir);
 
 		// Copy the build artifacts
 		// TODO Only copy dll/winmd/lib? Do we need anything else? pri?
-		fs.copySync(libSrcDir, libDestDir, {
+		await fs.copy(libSrcDir, libDestDir, {
 			preserveTimestamps: true, // Preserve the mtime and atime when copying files
 		});
 		// Copy the export header!
 		const header = lib.toLowerCase() + '_export.h';
-		fs.ensureDirSync(path.join(destDir, lib, 'include'));
-		fs.copySync(path.join(sourceDir, platformAbbrev, arch, suffix, header), path.join(destDir, lib, 'include', header));
+		await fs.ensureDir(path.join(destDir, lib, 'include'));
+		await fs.copy(path.join(sourceDir, platformAbbrev, arch, suffix, header), path.join(destDir, lib, 'include', header));
 	}
 }
 

@@ -98,21 +98,18 @@ function getSDKInstallDir(tiSDKVersion) {
  * @param {String} distDir path to the Windows SDK we'll be copying
  * @return {Promise}
  **/
-function copyWindowsIntoSDK(sdkPath, distDir) {
+async function copyWindowsIntoSDK(sdkPath, distDir) {
 	console.log(`Copying built Windows SDK from ${distDir} into SDK at ${sdkPath}`);
 	const dest = path.join(sdkPath, 'windows');
-	let hadWindowsSDK = false;
-	if (fs.existsSync(dest)) {
-		hadWindowsSDK = true;
-		fs.removeSync(dest);
+	const hadWindowsSDK = await fs.pathExists(dest);
+	if (hadWindowsSDK) {
+		await fs.remove(dest);
 	}
 	// TODO Be smarter about copying to speed it up? Only copy diff?
-	return fs.copy(distDir, dest).then(() => {
-		if (hadWindowsSDK) {
-			return Promise.resolve();
-		}
-		return addWindowsToSDKManifest(sdkPath);
-	});
+	await fs.copy(distDir, dest);
+	if (!hadWindowsSDK) {
+		await addWindowsToSDKManifest(sdkPath);
+	}
 }
 
 /**
@@ -122,15 +119,13 @@ function copyWindowsIntoSDK(sdkPath, distDir) {
  * @param {String} sdkPath path to the Titanium SDK we'll be hacking
  * @return {Promise}
  **/
-function addWindowsToSDKManifest(sdkPath) {
+async function addWindowsToSDKManifest(sdkPath) {
 	const manifest = path.join(sdkPath, 'manifest.json');
-	return fs.readJson(manifest)
-		.then(json => {
-			// append 'windows' to platforms array
-			json['platforms'].push('windows');
-			// Write new JSON back to file
-			return fs.writeJSON(manifest, json);
-		});
+	const json = await fs.readJson(manifest);
+	// append 'windows' to platforms array
+	json['platforms'].push('windows');
+	// Write new JSON back to file
+	await fs.writeJSON(manifest, json);
 }
 
 /**
@@ -139,11 +134,11 @@ function addWindowsToSDKManifest(sdkPath) {
  * @param  {string} location [description]
  * @return {Promise}          [description]
  */
-function setupSDK(branch, location) {
+async function setupSDK(branch, location) {
 	// If this is already installed we don't re-install, thankfully
-	return installSDK(branch)
-		.then(sdkVersion => getSDKInstallDir(sdkVersion))
-		.then(sdkPath => copyWindowsIntoSDK(sdkPath, location));
+	const sdkVersion = await installSDK(branch);
+	const sdkPath = await getSDKInstallDir(sdkVersion);
+	await copyWindowsIntoSDK(sdkPath, location);
 }
 
 // When run as single script.
