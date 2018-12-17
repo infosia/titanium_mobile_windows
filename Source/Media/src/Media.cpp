@@ -512,10 +512,6 @@ namespace TitaniumWindows
 
 				ui_ptr->get_currentWindow()->close(nullptr);
 
-				if (callback) {
-					callback();
-				}
-
 				// Clear showCamera state
 				cameraOptionsState__ = Titanium::Media::create_empty_CameraOptionsType(get_context());
 
@@ -797,6 +793,12 @@ namespace TitaniumWindows
 
 				if (isFrontCameraSelected__ && !isWindowsDesktop()) {
 					mediaCapture__->SetPreviewRotation(VideoRotation::Clockwise180Degrees);
+				}
+
+				if (isFrontCameraSelected__) {
+					captureElement__->FlowDirection = FlowDirection::RightToLeft;
+				} else {
+					captureElement__->FlowDirection = FlowDirection::LeftToRight;
 				}
 
 				const auto flashControl = mediaCapture__->VideoDeviceController->FlashControl;
