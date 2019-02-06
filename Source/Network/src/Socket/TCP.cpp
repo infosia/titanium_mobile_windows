@@ -24,7 +24,9 @@ namespace TitaniumWindows
 
 			TCP::~TCP()
 			{
-				TITANIUM_LOG_DEBUG("TitaniumWindows::Network::Socket::TCP::dtor");
+				if (socket__) {
+					close();
+				}
 			}
 
 			void TCP::JSExportInitialize()
@@ -205,13 +207,12 @@ namespace TitaniumWindows
 
 			void TCP::close() TITANIUM_NOEXCEPT
 			{
-				if (state__ == Titanium::Network::Socket::State::Connected ||
-					state__ == Titanium::Network::Socket::State::Listening) {
-					state__ = Titanium::Network::Socket::State::Closed;
+				// Make sure to delete socket object explicitly when socket is alive
+				if (socket__) {
 					delete socket__;
+					socket__ = nullptr;
 				} else {
 					error("socket is not in connected or listening state");
-					TITANIUM_LOG_ERROR("TCP::close: Titanium::Network::Socket::TCP: Socket is not in connected or listening state");
 				}
 			}
 
