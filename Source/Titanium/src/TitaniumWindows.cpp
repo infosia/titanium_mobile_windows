@@ -70,10 +70,9 @@
 #include "TitaniumWindows/GlobalObject.hpp"
 #include "TitaniumWindows/GlobalString.hpp"
 #include "TitaniumWindows/Utility.hpp"
-#include "Titanium/detail/TiImpl.hpp"
 #include "LayoutEngine/LayoutEngine.hpp"
 
-#include <Windows.h>
+#include <windows.h>
 #include <collection.h>
 #include <vector>
 
@@ -263,7 +262,7 @@ namespace TitaniumWindows
 
 			// Place the frame in the current Window.
 			Windows::UI::Xaml::Window::Current->Content = rootFrame;
-			application__->Run("/app");
+			application__->Run("/ti.main");
 		}
 
 		// Ensure the current Window is active.

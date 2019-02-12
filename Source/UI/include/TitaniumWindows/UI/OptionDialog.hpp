@@ -11,7 +11,6 @@
 
 #include "TitaniumWindows_UI_EXPORT.h"
 #include "Titanium/UI/OptionDialog.hpp"
-#include "Titanium/detail/TiBase.hpp"
 #include "TitaniumWindows/WindowsMacros.hpp"
 
 namespace TitaniumWindows
@@ -37,6 +36,7 @@ namespace TitaniumWindows
 			TITANIUM_PROPERTY_UNIMPLEMENTED(opaquebackground);
 			TITANIUM_PROPERTY_UNIMPLEMENTED(persistent);
 			TITANIUM_PROPERTY_UNIMPLEMENTED(titleid);
+			TITANIUM_PROPERTY_UNIMPLEMENTED(destructive);
 
 			OptionDialog(const JSContext&) TITANIUM_NOEXCEPT;
 

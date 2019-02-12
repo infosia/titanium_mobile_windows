@@ -9,8 +9,6 @@
 
 #include "TitaniumWindows_Media_EXPORT.h"
 #include "Titanium/Media/AudioPlayer.hpp"
-#include "Titanium/detail/TiBase.hpp"
-#include "TitaniumWindows/WindowsMacros.hpp"
 
 namespace TitaniumWindows
 {
@@ -30,6 +28,13 @@ namespace TitaniumWindows
 
 			TITANIUM_FUNCTION_UNIMPLEMENTED(stateDescription);
 			TITANIUM_FUNCTION_UNIMPLEMENTED(release);
+			TITANIUM_PROPERTY_UNIMPLEMENTED(allowBackground);
+			TITANIUM_PROPERTY_UNIMPLEMENTED(autoplay);
+			TITANIUM_PROPERTY_UNIMPLEMENTED(bitRate);
+			TITANIUM_PROPERTY_UNIMPLEMENTED(duration);
+			TITANIUM_PROPERTY_UNIMPLEMENTED(idle);
+			TITANIUM_PROPERTY_UNIMPLEMENTED(progress);
+			TITANIUM_PROPERTY_UNIMPLEMENTED(bufferSize);
 
 			virtual void set_paused(const bool& paused) TITANIUM_NOEXCEPT override;
 			virtual void set_url(const std::string& url) TITANIUM_NOEXCEPT override;

@@ -11,9 +11,8 @@
 
 #include "TitaniumWindows_UI_EXPORT.h"
 #include "Titanium/UI/EmailDialog.hpp"
-#include "Titanium/detail/TiBase.hpp"
 #include "TitaniumWindows/WindowsMacros.hpp"
-#include <Windows.h>
+#include <windows.h>
 
 namespace TitaniumWindows
 {
@@ -32,6 +31,10 @@ namespace TitaniumWindows
 		{
 
 		public:
+
+			TITANIUM_PROPERTY_UNIMPLEMENTED(html);
+			TITANIUM_FUNCTION_UNIMPLEMENTED(addAttachment);
+
 			EmailDialog(const JSContext&) TITANIUM_NOEXCEPT;
 
 			virtual ~EmailDialog()                  = default;

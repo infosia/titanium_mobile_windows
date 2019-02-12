@@ -230,7 +230,7 @@ namespace Titanium
 
 	TITANIUM_PROPERTY_GETTER(GeolocationModule, PROVIDER_NETWORK)
 	{
-		return get_context().CreateNumber(Titanium::Geolocation::Constants::to_underlying_type(Titanium::Geolocation::PROVIDER::NETOWORK));
+		return get_context().CreateNumber(Titanium::Geolocation::Constants::to_underlying_type(Titanium::Geolocation::PROVIDER::NETWORK));
 	}
 
 	TITANIUM_PROPERTY_GETTER(GeolocationModule, PROVIDER_PASSIVE)
@@ -317,9 +317,20 @@ namespace Titanium
 			var requestUrl = 'http://api.appcelerator.com/p/v1/geo?d=r',
 				client = Ti.Network.createHTTPClient({
 					onload: function (e) {
-						var response = JSON.parse(this.responseText);
+						var response = JSON.parse(this.responseText),
+							length = 0,
+							i = 0;
 						if (response.success) {
 							response.code = 0;
+							if (response.places) {
+								length = response.places.length;
+								for (i = 0; i < length; i++) {
+									response.places[i].countryCode = response.places[i].country_code;
+									response.places[i].postalCode = response.places[i].zipcode;
+								}
+								Ti.API.warn("GeocodedAddress properties country_code and zipcode are deprecated in SDK 8.0.0 and will be removed in 9.0.0");
+								Ti.API.warn("Please replace usage with the respective properties: countryCode and postalCode");
+							}
 						} else {
 							response.code = -1;
 							response.error = 'no results';
