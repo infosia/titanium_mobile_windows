@@ -28,6 +28,25 @@ namespace TitaniumWindows
 		using namespace Windows::UI::Xaml::Documents;
 		using namespace Windows::UI::Text;
 
+		// Calculate default height for the Label
+		double Label::GetDefaultHeight() TITANIUM_NOEXCEPT
+		{
+			static double defaultHeight = 26;
+
+			static std::once_flag of;
+			std::call_once(of, [=] {
+				const auto label = ref new Windows::UI::Xaml::Controls::TextBlock();
+				label->FontSize = DefaultFontSize;
+
+				Windows::Foundation::Size desiredSize{ static_cast<float>(label->MaxWidth), static_cast<float>(label->MaxHeight) };
+				label->Measure(desiredSize);
+
+				defaultHeight = label->ActualHeight;
+			});
+
+			return defaultHeight;
+		}
+
 		Label::Label(const JSContext& js_context) TITANIUM_NOEXCEPT
 			  : Titanium::UI::Label(js_context)
 		{
@@ -56,16 +75,14 @@ namespace TitaniumWindows
 			Titanium::UI::Label::setLayoutDelegate<WindowsViewLayoutDelegate>();
 
 			label__->TextWrapping = Windows::UI::Xaml::TextWrapping::Wrap;
-			label__->TextTrimming = Windows::UI::Xaml::TextTrimming::None;
+			label__->TextTrimming = Windows::UI::Xaml::TextTrimming::CharacterEllipsis;
 			label__->VerticalAlignment = Windows::UI::Xaml::VerticalAlignment::Center;
 			label__->FontSize = DefaultFontSize;
 
 			// TIMOB-19048: max size is set to screen size by default
-			const auto current = Windows::UI::Xaml::Window::Current;
-			if (current) {
-				label__->MaxWidth = current->Bounds.Width;
-				label__->MaxHeight = current->Bounds.Height;
-			}
+			static const auto bounds = Windows::UI::Xaml::Window::Current->Bounds;
+			label__->MaxWidth  = bounds.Width;
+			label__->MaxHeight = bounds.Height;
 
 			border__->SizeChanged += ref new Windows::UI::Xaml::SizeChangedEventHandler([this](Platform::Object^, Windows::UI::Xaml::SizeChangedEventArgs^ e) {
 				try {
@@ -111,7 +128,7 @@ namespace TitaniumWindows
 								}
 							}
 							
-							if (previousSize__.width != width || previousSize__.height != height) {
+							if (!skipResizing && (previousSize__.width != width || previousSize__.height != height)) {
 								need_measure__ = true;
 								previousSize__.width = width;
 								previousSize__.height = height;
@@ -166,7 +183,7 @@ namespace TitaniumWindows
 
 			if (get_attributedString()) {
 				set_attributedString(get_attributedString());
-			} else if (!get_autoLink().empty()) {
+			} else if (get_autoLink_enabled()) {
 				set_autoLink(get_autoLink());
 			} else {
 				label__->Text = TitaniumWindows::Utility::ConvertUTF8String(text);
@@ -182,6 +199,7 @@ namespace TitaniumWindows
 		void Label::set_autoLink(const std::unordered_set<Titanium::UI::AUTOLINK>& autoLink) TITANIUM_NOEXCEPT
 		{
 			Titanium::UI::Label::set_autoLink(autoLink);
+
 			label__->Inlines->Clear();
 
 			const auto enableALL = autoLink.find(Titanium::UI::AUTOLINK::ALL)  != autoLink.end();
@@ -240,29 +258,55 @@ namespace TitaniumWindows
 
 			// minimumFontSize decreases the fontsize of the text to fit the width. This enables single-line mode. Only works with minimumFontSize > 0
 			const auto minimumFontSize = get_minimumFontSize();
-			const auto measuredWidth = layout_node->element.measuredWidth;
-			if (minimumFontSize > 0 && measuredWidth > 0) {
-				auto previousFontSize = label__->FontSize;
-				while (previousFontSize > minimumFontSize && minimumFontSize > 1.0 && measuredWidth < label__->ActualWidth) {
-					previousFontSize -= 0.1;
-					label__->FontSize = previousFontSize;
-					label__->Measure(desiredSize);
+			if (minimumFontSize > 0) {
+				const auto layout_node = layout->getLayoutNode();
+				// Calculate the label size when label is not loaded yet. This effectively updates node element properties.
+				if (!layout->isLoaded() && layout_node->parent != nullptr) {
+					Titanium::LayoutEngine::nodeLayout(layout_node->parent);
+				}
+				const auto measuredWidth = layout_node->element.measuredWidth;
+				if (measuredWidth > 0) {
+					auto previousFontSize = label__->FontSize;
+					while (previousFontSize > minimumFontSize && minimumFontSize > 1.0 && measuredWidth < label__->ActualWidth) {
+						previousFontSize -= 0.1;
+						label__->FontSize = previousFontSize;
+						label__->Measure(desiredSize);
+					}
 				}
 			}
-
+			auto doLayout = false;
 			const auto width = layout->get_width();
 			const auto height = layout->get_height();
 			const auto TI_UI_SIZE = Titanium::UI::Constants::to_string(Titanium::UI::LAYOUT::SIZE);
 			if ((width.empty() || width == TI_UI_SIZE || width == "auto") && layout->canUseSizeWidth()) {
 				layout->fixWidth(label__->ActualWidth + border__->BorderThickness.Left + border__->BorderThickness.Right + 1 /* Border needs this margin */ );
-				layout->requestLayout();
+				doLayout = true;
 			}
 			if ((height.empty() || height == TI_UI_SIZE || height == "auto") && layout->canUseSizeHeight()) {
 				layout->fixHeight(label__->ActualHeight + border__->BorderThickness.Top + border__->BorderThickness.Bottom + 1 /* Border needs this margin */ );
+				doLayout = true;
+			}
+			if (doLayout) {
 				layout->requestLayout();
 			}
 
 			need_measure__ = false;
+		}
+
+		void Label::set_ellipsize(const Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE& ellipsize) TITANIUM_NOEXCEPT
+		{
+			Titanium::UI::Label::set_ellipsize(ellipsize);
+			if (ellipsize == Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::NONE) {
+				label__->TextTrimming = Windows::UI::Xaml::TextTrimming::None;
+			} else if (ellipsize == Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::CHAR_WRAP) {
+				label__->TextTrimming = Windows::UI::Xaml::TextTrimming::CharacterEllipsis;
+			} else if (ellipsize == Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::END) {
+				label__->TextTrimming = Windows::UI::Xaml::TextTrimming::CharacterEllipsis;
+			} else if (ellipsize == Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::WORD_WRAP) {
+				label__->TextTrimming = Windows::UI::Xaml::TextTrimming::WordEllipsis;
+			} else if (ellipsize == Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::CLIP) {
+				label__->TextTrimming = Windows::UI::Xaml::TextTrimming::Clip;
+			}
 		}
 
 		void Label::set_textAlign(const Titanium::UI::TEXT_ALIGNMENT& textAlign) TITANIUM_NOEXCEPT

@@ -18,8 +18,9 @@ namespace Titanium
 		Label::Label(const JSContext& js_context) TITANIUM_NOEXCEPT
 		    : View(js_context, "Ti.UI.Label"),
 		      autoLink__({AUTOLINK::NONE}),
+              autoLink_enabled__(false),
 		      color__(js_context.CreateString()),
-		      ellipsize__(false),
+		      ellipsize__(TEXT_ELLIPSIZE_TRUNCATE::END),
 		      text__(js_context.CreateString()),
 		      textAlign__(TEXT_ALIGNMENT::LEFT),
 		      verticalAlign__(TEXT_VERTICAL_ALIGNMENT::CENTER),
@@ -30,12 +31,13 @@ namespace Titanium
 		}
 
 		TITANIUM_PROPERTY_READWRITE(Label, std::unordered_set<AUTOLINK>, autoLink)
+		TITANIUM_PROPERTY_READ(Label, bool, autoLink_enabled)
 		TITANIUM_PROPERTY_READWRITE(Label, std::string, text)
 		TITANIUM_PROPERTY_READWRITE(Label, TEXT_ALIGNMENT, textAlign)
 		TITANIUM_PROPERTY_READWRITE(Label, TEXT_VERTICAL_ALIGNMENT, verticalAlign)
 		TITANIUM_PROPERTY_READWRITE(Label, bool, wordWrap)
 		TITANIUM_PROPERTY_READWRITE(Label, std::string, color)
-		TITANIUM_PROPERTY_READWRITE(Label, bool, ellipsize)
+		TITANIUM_PROPERTY_READWRITE(Label, TEXT_ELLIPSIZE_TRUNCATE, ellipsize)
 		TITANIUM_PROPERTY_READWRITE(Label, Font, font)
 		TITANIUM_PROPERTY_READWRITE(Label, std::shared_ptr<AttributedString>, attributedString)
 		TITANIUM_PROPERTY_READWRITE(Label, double, minimumFontSize)
@@ -103,6 +105,8 @@ namespace Titanium
 		{
 			TITANIUM_ASSERT(argument.IsNumber());
 			autoLink__ = Constants::to_AUTOLINK(static_cast<std::underlying_type<AUTOLINK>::type>(argument));
+			autoLink_enabled__ = autoLink__.find(Titanium::UI::AUTOLINK::NONE) == autoLink__.end();
+
 			set_autoLink(autoLink__);
 			return true;
 		}
@@ -113,8 +117,8 @@ namespace Titanium
 		TITANIUM_PROPERTY_GETTER_STRING(Label, color)
 		TITANIUM_PROPERTY_SETTER_STRING(Label, color)
 
-		TITANIUM_PROPERTY_GETTER_BOOL(Label, ellipsize)
-		TITANIUM_PROPERTY_SETTER_BOOL(Label, ellipsize)
+		TITANIUM_PROPERTY_GETTER_ENUM(Label, ellipsize)
+		TITANIUM_PROPERTY_SETTER_ENUM(Label, ellipsize, TEXT_ELLIPSIZE_TRUNCATE)
 
 		TITANIUM_PROPERTY_GETTER(Label, font)
 		{

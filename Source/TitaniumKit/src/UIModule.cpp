@@ -15,6 +15,9 @@
 #include <sstream>
 
 #define CREATE_TITANIUM_UI(NAME) \
+  static auto NAME##_ctor = this_object; \
+  static std::once_flag of; \
+  std::call_once(of, [=] {\
   JSValue Titanium_property = this_object.get_context().get_global_object().GetProperty("Titanium"); \
   TITANIUM_ASSERT(Titanium_property.IsObject()); \
   JSObject Titanium = static_cast<JSObject>(Titanium_property); \
@@ -23,8 +26,9 @@
   JSObject UI = static_cast<JSObject>(UI_property); \
   JSValue NAME##_property = UI.GetProperty(#NAME); \
   TITANIUM_ASSERT(NAME##_property.IsObject()); \
-  JSObject NAME = static_cast<JSObject>(NAME##_property); \
-  auto NAME##_obj = NAME.CallAsConstructor(parameters); \
+  NAME##_ctor = static_cast<JSObject>(NAME##_property); \
+  });  \
+  auto NAME##_obj = NAME##_ctor.CallAsConstructor(); \
   Titanium::Module::applyProperties(parameters, NAME##_obj); \
   return NAME##_obj;
 
@@ -355,6 +359,38 @@ namespace Titanium
 	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_AUTOCAPITALIZATION_WORDS)
 	{
 		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_AUTOCAPITALIZATION::WORDS));
+	}
+	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_ELLIPSIZE_TRUNCATE_NONE)
+	{
+		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::NONE));
+	}
+	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_ELLIPSIZE_TRUNCATE_CHAR_WRAP)
+	{
+		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::CHAR_WRAP));
+	}
+	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_ELLIPSIZE_TRUNCATE_WORD_WRAP)
+	{
+		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::WORD_WRAP));
+	}
+	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_ELLIPSIZE_TRUNCATE_CLIP)
+	{
+		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::CLIP));
+	}
+	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_ELLIPSIZE_TRUNCATE_START)
+	{
+		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::START));
+	}
+	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_ELLIPSIZE_TRUNCATE_MIDDLE)
+	{
+		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::MIDDLE));
+	}
+	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_ELLIPSIZE_TRUNCATE_END)
+	{
+		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::END));
+	}
+	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_ELLIPSIZE_TRUNCATE_MARQUEE)
+	{
+		return get_context().CreateNumber(Titanium::UI::Constants::to_underlying_type(Titanium::UI::TEXT_ELLIPSIZE_TRUNCATE::MARQUEE));
 	}
 	TITANIUM_PROPERTY_GETTER(UIModule, TEXT_STYLE_BODY)
 	{
@@ -759,6 +795,14 @@ namespace Titanium
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_AUTOCAPITALIZATION_NONE);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_AUTOCAPITALIZATION_SENTENCES);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_AUTOCAPITALIZATION_WORDS);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_ELLIPSIZE_TRUNCATE_NONE);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_ELLIPSIZE_TRUNCATE_CHAR_WRAP);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_ELLIPSIZE_TRUNCATE_WORD_WRAP);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_ELLIPSIZE_TRUNCATE_CLIP);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_ELLIPSIZE_TRUNCATE_START);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_ELLIPSIZE_TRUNCATE_MIDDLE);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_ELLIPSIZE_TRUNCATE_END);
+		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_ELLIPSIZE_TRUNCATE_MARQUEE);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_STYLE_BODY);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_STYLE_CAPTION1);
 		TITANIUM_ADD_CONSTANT_PROPERTY(UIModule, TEXT_STYLE_CAPTION2);

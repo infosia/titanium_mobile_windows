@@ -49,7 +49,7 @@ namespace Titanium
 
 			  Default: false
 			*/
-			TITANIUM_PROPERTY_IMPL_DEF(bool, ellipsize);
+			TITANIUM_PROPERTY_IMPL_DEF(TEXT_ELLIPSIZE_TRUNCATE, ellipsize);
 
 			/*!
 			  @method
@@ -123,6 +123,7 @@ namespace Titanium
 			    textArea.autoLink = AUTOLINK_MAP_ADDRESSES|AUTOLINK_PHONE_NUMBERS;
 			*/
 			TITANIUM_PROPERTY_IMPL_DEF(std::unordered_set<AUTOLINK>, autoLink);
+			TITANIUM_PROPERTY_IMPL_READONLY_DEF(bool, autoLink_enabled);
 
 			/*!
 			  @property
@@ -202,7 +203,7 @@ namespace Titanium
 #pragma warning(push)
 #pragma warning(disable : 4251)
 			std::string color__;
-			bool ellipsize__;
+			TEXT_ELLIPSIZE_TRUNCATE ellipsize__;
 			Font font__;
 			std::string text__;
 			std::string textid__;
@@ -213,6 +214,7 @@ namespace Titanium
 			std::unordered_set<AUTOLINK> autoLink__;
 			double minimumFontSize__;
 			std::uint32_t maxLines__;
+			bool autoLink_enabled__;
 #pragma warning(pop)
 		};
 	} // namespace UI
