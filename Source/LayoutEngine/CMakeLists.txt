@@ -117,6 +117,8 @@ if (WIN32)
   # Therefore we disable /OPT:REF and /OPT:ICF for the Debug
   # configuration.
   set_property(TARGET LayoutEngine APPEND_STRING PROPERTY LINK_FLAGS_DEBUG "/OPT:NOREF /OPT:NOICF")
+  set_property(TARGET LayoutEngine APPEND_STRING PROPERTY LINK_FLAGS_RELEASE "/LTCG")
+
 endif()
 
 if (NOT LayoutEngine_DISABLE_TESTS)

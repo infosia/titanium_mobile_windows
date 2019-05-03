@@ -90,6 +90,8 @@ set_property(TARGET TitaniumWindows_Utility APPEND_STRING PROPERTY LINK_FLAGS_DE
 # Disable inline function expansion, prevents "C1001 An internal error has occurred in the compiler."
 set_property(TARGET TitaniumWindows_Utility APPEND_STRING PROPERTY COMPILE_FLAGS "/Ob0")
 
+set_property(TARGET TitaniumWindows_Utility APPEND_STRING PROPERTY LINK_FLAGS_RELEASE "/LTCG")
+
 if (NOT TitaniumWindows_Utility_DISABLE_TESTS)
   add_subdirectory(test)
 endif()
