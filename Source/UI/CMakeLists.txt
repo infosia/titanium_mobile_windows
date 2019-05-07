@@ -175,8 +175,6 @@ set_property(TARGET TitaniumWindows_UI APPEND_STRING PROPERTY LINK_FLAGS_DEBUG "
 # Fix error C4996: 'std::_Copy_impl': Function call with parameters that may be unsafe (needed by boost::split)
 set_property(TARGET TitaniumWindows_UI APPEND_STRING PROPERTY COMPILE_FLAGS " -D_SCL_SECURE_NO_WARNINGS")
 
-set_property(TARGET TitaniumWindows_UI APPEND_STRING PROPERTY LINK_FLAGS_RELEASE "/LTCG")
-
 if (NOT TitaniumWindows_UI_DISABLE_TESTS)
   add_subdirectory(test)
 endif()

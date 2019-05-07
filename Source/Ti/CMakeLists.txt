@@ -154,7 +154,6 @@ set_target_properties(TitaniumWindows_Ti PROPERTIES VS_WINRT_COMPONENT TRUE)
 # Therefore we disable /OPT:REF and /OPT:ICF for the Debug
 # configuration.
 set_property(TARGET TitaniumWindows_Ti APPEND_STRING PROPERTY LINK_FLAGS_DEBUG "/OPT:NOREF /OPT:NOICF")
-set_property(TARGET TitaniumWindows_Ti APPEND_STRING PROPERTY LINK_FLAGS_RELEASE "/LTCG")
 
 if (NOT TitaniumWindows_Ti_DISABLE_TESTS)
   add_subdirectory(test)

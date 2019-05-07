@@ -78,8 +78,6 @@ set_target_properties(TitaniumWindows_Filesystem PROPERTIES VS_WINRT_COMPONENT T
 # configuration.
 set_property(TARGET TitaniumWindows_Filesystem APPEND_STRING PROPERTY LINK_FLAGS_DEBUG "/OPT:NOREF /OPT:NOICF")
 
-set_property(TARGET TitaniumWindows_Filesystem APPEND_STRING PROPERTY LINK_FLAGS_RELEASE "/LTCG")
-
 if (NOT TitaniumWindows_Filesystem_DISABLE_TESTS)
   add_subdirectory(test)
 endif()

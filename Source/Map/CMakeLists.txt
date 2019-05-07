@@ -89,8 +89,6 @@ set_target_properties(TitaniumWindows_Map PROPERTIES VS_WINRT_COMPONENT TRUE)
 # configuration.
 set_property(TARGET TitaniumWindows_Map APPEND_STRING PROPERTY LINK_FLAGS_DEBUG "/OPT:NOREF /OPT:NOICF")
 
-set_property(TARGET TitaniumWindows_Map APPEND_STRING PROPERTY LINK_FLAGS_RELEASE "/LTCG")
-
 if (NOT TitaniumWindows_Map_DISABLE_TESTS)
   add_subdirectory(test)
 endif()

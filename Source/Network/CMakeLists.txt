@@ -91,8 +91,6 @@ set_property(TARGET TitaniumWindows_Network APPEND_STRING PROPERTY LINK_FLAGS_DE
 # Fix error C4996: 'std::_Copy_impl': Function call with parameters that may be unsafe (needed by boost::signals used in HTTPClient and Network)
 set_property(TARGET TitaniumWindows_Network APPEND_STRING PROPERTY COMPILE_FLAGS " -D_SCL_SECURE_NO_WARNINGS")
 
-set_property(TARGET TitaniumWindows_Network APPEND_STRING PROPERTY LINK_FLAGS_RELEASE "/LTCG")
-
 if (NOT TitaniumWindows_Network_DISABLE_TESTS)
   add_subdirectory(test)
 endif()
