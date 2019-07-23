@@ -69,6 +69,11 @@ namespace Titanium
 			return std::vector<std::shared_ptr<Titanium::Calendar::Attendee>>();
 		}
 
+		void Event::createAlert(const std::shared_ptr<Titanium::Calendar::Alert>&) TITANIUM_NOEXCEPT
+		{
+			TITANIUM_LOG_WARN("Event::createAlert: Unimplemented");
+		}
+
 		void Event::createReminder(const std::shared_ptr<Titanium::Calendar::Reminder>&) TITANIUM_NOEXCEPT
 		{
 			TITANIUM_LOG_WARN("Event::createReminder: Unimplemented");
@@ -158,6 +163,7 @@ namespace Titanium
 		{
 			ENSURE_OPTIONAL_OBJECT_AT_INDEX(parameters, 0);
 			CREATE_TITANIUM_CALENDAR(Alert);
+			createAlert(Alert_obj.GetPrivate<Titanium::Calendar::Alert>());
 			return Alert_obj;
 		}
 

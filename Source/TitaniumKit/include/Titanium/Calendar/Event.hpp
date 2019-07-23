@@ -39,6 +39,7 @@ namespace Titanium
 			virtual void removeRecurrenceRule(std::shared_ptr<Titanium::Calendar::RecurrenceRule> rule) TITANIUM_NOEXCEPT;
 			virtual bool refresh(const Titanium::Calendar::SPAN span) TITANIUM_NOEXCEPT;
 			virtual bool save(const Titanium::Calendar::SPAN span) TITANIUM_NOEXCEPT;
+			virtual void createAlert(const std::shared_ptr<Titanium::Calendar::Alert>&) TITANIUM_NOEXCEPT;
 			virtual void createReminder(const std::shared_ptr<Titanium::Calendar::Reminder>&) TITANIUM_NOEXCEPT;
 
 			virtual std::string get_calendarID() const TITANIUM_NOEXCEPT;

@@ -16,6 +16,7 @@ namespace Titanium
 
 		TITANIUM_PROPERTY_READWRITE(Alert, boost::optional<std::chrono::system_clock::time_point>, absoluteDate);
 		TITANIUM_PROPERTY_READWRITE(Alert, boost::optional<std::chrono::system_clock::time_point>, alarmTime);
+		TITANIUM_PROPERTY_READWRITE(Alert, std::chrono::minutes, minutes);
 		TITANIUM_PROPERTY_READWRITE(Alert, std::string, id);
 
 		Alert::Alert(const JSContext& js_context, const std::vector<JSValue>& arguments) TITANIUM_NOEXCEPT
@@ -29,6 +30,7 @@ namespace Titanium
 			JSExport<Alert>::SetParent(JSExport<Module>::Class());
 
 			TITANIUM_ADD_PROPERTY(Alert, absoluteDate);
+			TITANIUM_ADD_PROPERTY(Alert, minutes);
 			TITANIUM_ADD_PROPERTY_READONLY(Alert, alarmTime);
 			TITANIUM_ADD_PROPERTY_READONLY(Alert, id);
 		}
@@ -37,6 +39,8 @@ namespace Titanium
 		TITANIUM_PROPERTY_SETTER_DATE(Alert, absoluteDate);
 		TITANIUM_PROPERTY_GETTER_DATE(Alert, alarmTime);
 		TITANIUM_PROPERTY_GETTER_STRING(Alert, id);
+		TITANIUM_PROPERTY_GETTER_TIME(Alert, minutes);
+		TITANIUM_PROPERTY_SETTER_TIME_MINUTES(Alert, minutes);
 
 	} // namespace Calendar
 } // namespace Titanium

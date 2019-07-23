@@ -58,6 +58,14 @@ namespace Titanium
 
 			/*!
 			  @property
+			  @abstract absoluteDate
+			  @discussion The absolute date for the alarm.
+			*/
+			TITANIUM_PROPERTY_DEF(minutes);
+			TITANIUM_PROPERTY_IMPL_DEF(std::chrono::minutes, minutes);
+
+			/*!
+			  @property
 			  @abstract id
 			  @discussion Identifier of the event for which this alert is set.
 			*/
@@ -69,6 +77,7 @@ namespace Titanium
 #pragma warning(disable : 4251)
 			boost::optional<std::chrono::system_clock::time_point> absoluteDate__;	
 			boost::optional<std::chrono::system_clock::time_point> alarmTime__;	
+			std::chrono::minutes minutes__;
 			std::string id__;
 #pragma warning(pop)
 		};

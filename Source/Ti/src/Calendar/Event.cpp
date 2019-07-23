@@ -69,6 +69,16 @@ namespace TitaniumWindows
 			appointment__ = ref new Appointment();
 		}
 
+		void Event::createAlert(const std::shared_ptr<Titanium::Calendar::Alert>& alert) TITANIUM_NOEXCEPT
+		{
+			Titanium::Calendar::Event::createAlert(alert);
+
+			Windows::Foundation::TimeSpan span;
+			span.Duration = (alert->get_minutes().count() * 60) * 1000 * 10000LL; // 100-nanoseconds
+
+			appointment__->Reminder = span;
+		}
+
 		void Event::createReminder(const std::shared_ptr<Titanium::Calendar::Reminder>& reminder) TITANIUM_NOEXCEPT
 		{
 			Titanium::Calendar::Event::createReminder(reminder);
