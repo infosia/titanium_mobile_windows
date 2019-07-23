@@ -51,6 +51,12 @@ namespace Titanium
 			return false;
 		}
 
+		bool Event::remove(const Titanium::Calendar::SPAN span) TITANIUM_NOEXCEPT
+		{
+			TITANIUM_LOG_WARN("Event::remove: Unimplemented");
+			return false;
+		}
+
 		bool Event::save(const Titanium::Calendar::SPAN span) TITANIUM_NOEXCEPT
 		{
 			TITANIUM_LOG_WARN("Event::save: Unimplemented");
@@ -149,6 +155,7 @@ namespace Titanium
 			TITANIUM_ADD_FUNCTION(Event, createReminder);
 			TITANIUM_ADD_FUNCTION(Event, refresh);
 			TITANIUM_ADD_FUNCTION(Event, save);
+			TITANIUM_ADD_FUNCTION(Event, remove);
 			TITANIUM_ADD_FUNCTION(Event, removeRecurrenceRule);
 		}
  
@@ -195,6 +202,12 @@ namespace Titanium
 			ENSURE_OBJECT_AT_INDEX(rule, 0);
 			removeRecurrenceRule(rule.GetPrivate<RecurrenceRule>());
 			return get_context().CreateUndefined();
+		}
+
+		TITANIUM_FUNCTION(Event, remove)
+		{
+			ENSURE_ENUM_AT_INDEX(span, 0, Titanium::Calendar::SPAN);
+			return get_context().CreateBoolean(remove(span));
 		}
 
  		TITANIUM_FUNCTION(Event, save)

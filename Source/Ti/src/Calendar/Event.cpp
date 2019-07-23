@@ -346,19 +346,37 @@ namespace TitaniumWindows
 			return true;
 		}
 
-		bool Event::save(const Titanium::Calendar::SPAN span) TITANIUM_NOEXCEPT
+		bool Event::remove(const Titanium::Calendar::SPAN span) TITANIUM_NOEXCEPT
 		{
-			concurrency::create_task(appointmentCalendar__->SaveAppointmentAsync(appointment__)).then([this](concurrency::task<void> task) {
+			bool result = false;
+			concurrency::create_task(appointmentCalendar__->DeleteAppointmentAsync(appointment__->LocalId)).then([this, &result](concurrency::task<void> task) {
 				try {
 					task.get();
-					updateObjectProperties();
+					result = true;
 				} catch (Platform::Exception^ e) {
 					TITANIUM_LOG_WARN(TitaniumWindows::Utility::ConvertUTF8String(e->Message));
 				} catch (...) {
 					TITANIUM_LOG_WARN("Exception during Event::save");
 				}
 			});
-			return true;
+			return result;
+		}
+
+		bool Event::save(const Titanium::Calendar::SPAN span) TITANIUM_NOEXCEPT
+		{
+			bool result = false;
+			concurrency::create_task(appointmentCalendar__->SaveAppointmentAsync(appointment__)).then([this, &result](concurrency::task<void> task) {
+				try {
+					task.get();
+					updateObjectProperties();
+					result = true;
+				} catch (Platform::Exception^ e) {
+					TITANIUM_LOG_WARN(TitaniumWindows::Utility::ConvertUTF8String(e->Message));
+				} catch (...) {
+					TITANIUM_LOG_WARN("Exception during Event::save");
+				}
+			});
+			return result;
 		}
 
 		std::vector<std::shared_ptr<Titanium::Calendar::Alert>> Event::get_alerts() const TITANIUM_NOEXCEPT
