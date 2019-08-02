@@ -48,46 +48,16 @@ describe('__filename', function () {
 function loadTests() {
 	// ============================================================================
 	// Add the tests here using "require"
-	// Global behavior (top-level timers, functions, types)
-	require('./console.test');
-	require('./error.test');
-	require('./global.test');
-	require('./require.test');
-	require('./string.test');
-	require('./timers.test');
-	// ES6 syntax/compatability tests
-	require('./es6.arrows.test');
-	require('./es6.async.await.test');
-	require('./es6.class.test');
-	require('./es6.default.args.test');
-	require('./es6.import.test');
-	require('./es6.rest.args.test');
-	require('./es6.spread.args.test');
-	require('./es6.string.interpolation.test');
-	// node-compat core modules
-	require('./assert.test');
-	require('./os.test');
-	require('./path.test');
-	require('./util.test');
 	// Titanium APIs
-	require('./core.runtime.test'); // tests on how proxies behave w/regard to hasOwnProperty
 	require('./ti.accelerometer.test');
 	require('./ti.analytics.test');
-	require('./ti.android.test');
-	require('./ti.android.notificationmanager.test');
-	require('./ti.android.service.test');
 	require('./ti.api.test');
 	require('./ti.app.test');
-	require('./ti.app.android.test');
-	require('./ti.app.ios.test');
-	require('./ti.app.ios.searchquery.test');
-	require('./ti.app.ios.useractivity.test');
 	require('./ti.app.properties.test');
 	require('./ti.app.windows.backgroundservice.test');
 	require('./ti.blob.test');
 	require('./ti.bootstrap.test');
 	require('./ti.buffer.test');
-	require('./ti.calendar.test');
 	require('./ti.codec.test');
 	require('./ti.contacts.test');
 	require('./ti.contacts.group.test');
@@ -103,7 +73,7 @@ function loadTests() {
 	require('./ti.media.test');
 	require('./ti.media.audioplayer.test');
 	require('./ti.media.sound.test');
-	require('./ti.media.videoplayer.test');
+	//require('./ti.media.videoplayer.test');
 	require('./ti.network.test');
 	require('./ti.network.cookie.test');
 	require('./ti.network.httpclient.test');
@@ -119,21 +89,14 @@ function loadTests() {
 	require('./ti.ui.matrix2d.test');
 	require('./ti.ui.activityindicator.test');
 	require('./ti.ui.alertdialog.test');
-	require('./ti.ui.android.drawerlayout.test');
 	require('./ti.ui.attributedstring.test');
 	require('./ti.ui.button.test');
 	require('./ti.ui.constants.test');
 	require('./ti.ui.emaildialog.test');
 	require('./ti.ui.imageview.test');
-	require('./ti.ui.ios.test');
-	require('./ti.ui.ios.navigationwindow.test');
-	require('./ti.ui.ios.previewcontext.test');
-	require('./ti.ui.ios.splitwindow.test');
-	require('./ti.ui.ios.webviewconfiguration.test');
 	require('./ti.ui.label.test');
 	require('./ti.ui.layout.test');
 	require('./ti.ui.listview.test');
-	require('./ti.ui.maskedimage.test');
 	require('./ti.ui.navigationwindow.test');
 	require('./ti.ui.optiondialog.test');
 	require('./ti.ui.picker.test');
@@ -141,7 +104,6 @@ function loadTests() {
 	require('./ti.ui.scrollableview.test');
 	require('./ti.ui.scrollview.test');
 	require('./ti.ui.searchbar.test');
-	require('./ti.ui.shortcutitem.test');
 	require('./ti.ui.slider.test');
 	require('./ti.ui.switch.test');
 	require('./ti.ui.tab.test');
