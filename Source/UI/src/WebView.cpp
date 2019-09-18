@@ -15,6 +15,7 @@
 #include <ppltasks.h>
 #include <concrt.h>
 #include "TitaniumWindows/UI/WindowsViewLayoutDelegate.hpp"
+#include "TitaniumWindows/Blob.hpp"
 #include "Titanium/UI/webview_js.hpp"
 
 using namespace Windows::UI::Xaml;
@@ -205,6 +206,8 @@ namespace TitaniumWindows
 			auto args = ref new Platform::Collections::Vector<Platform::String^>();
 			args->Append(TitaniumWindows::Utility::ConvertUTF8String(code));
 
+			JSValueProtect(static_cast<JSContextRef>(get_context()), static_cast<JSValueRef>(get_object()));
+
 			concurrency::task<Platform::String^>(webview__->InvokeScriptAsync("eval", args)).then([this, callback](concurrency::task<Platform::String^> task){
 				try {
 					const auto result = task.get();
@@ -217,6 +220,7 @@ namespace TitaniumWindows
 				} catch (...) {
 					TITANIUM_LOG_WARN("Unknown error at WebView.evalJS");
 				}
+				JSValueUnprotect(static_cast<JSContextRef>(get_context()), static_cast<JSValueRef>(get_object()));
 			});
 
 			// Always return empty string because WebView.InvokeScriptAsync only works with async on Windows
@@ -249,6 +253,14 @@ namespace TitaniumWindows
 			return content;
 		}
 
+		void WebView::handleBaseURL() TITANIUM_NOEXCEPT
+		{
+			auto args = ref new Platform::Collections::Vector<Platform::String^>();
+			args->Append(L"window.document.documentElement.innerHTML='" + TitaniumWindows::Utility::ConvertUTF8String(get_html()) + L"'");
+
+			webview__->InvokeScriptAsync("eval", args);
+		}
+
 		void WebView::getInnerHTML() TITANIUM_NOEXCEPT
 		{
 			try {
@@ -277,8 +289,13 @@ namespace TitaniumWindows
 			load_event__ = webview__->NavigationCompleted += ref new Windows::Foundation::TypedEventHandler
 				<Controls::WebView^, Controls::WebViewNavigationCompletedEventArgs^>([this](Platform::Object^ sender, Controls::WebViewNavigationCompletedEventArgs^ e) {				
 				try {
-					getInnerHTML();
-					
+					if (baseURL_loading__) {
+						baseURL_loading__ = false;
+						handleBaseURL();
+					} else {
+						getInnerHTML();
+					}
+
 					loading__ = false;
 					if (e->IsSuccess && load_event_enabled__) {
 						JSObject obj = get_context().CreateObject();
@@ -293,6 +310,8 @@ namespace TitaniumWindows
 						obj.SetProperty("code", get_context().CreateString(Titanium::UI::Constants::to_string(getUrlError(e->WebErrorStatus))));
 						fireEvent("error", obj);
 					}
+
+					JSValueUnprotect(static_cast<JSContextRef>(get_context()), static_cast<JSValueRef>(get_object()));
 				} catch (...) {
 					TITANIUM_LOG_DEBUG("Erorr at WebView.load");
 				}
@@ -328,6 +347,9 @@ namespace TitaniumWindows
 							}
 						}
 					}
+
+					// Save this instance to make sure WebView is not garbage-collected before load callback is fired.
+					JSValueProtect(static_cast<JSContextRef>(get_context()), static_cast<JSValueRef>(get_object()));
 
 					loading__ = true;
 					if (beforeload_event_enabled__) {
@@ -432,6 +454,20 @@ namespace TitaniumWindows
 			webview__->NavigateToString(TitaniumWindows::Utility::ConvertUTF8String(InjectLocalScript(html)));
 		}
 
+		bool WebView::setHtml(const std::string& html, const std::unordered_map<std::string, std::string>& options) TITANIUM_NOEXCEPT
+		{
+			const auto baseURL = options.find("baseURL");
+			if (baseURL != options.end()) {
+				const auto uri = TitaniumWindows::Utility::GetUriFromPath(baseURL->second);
+				html__ = html;
+				baseURL_loading__ = true;
+				webview__->Navigate(uri);
+			} else {
+				set_html(html);
+			}
+			return true;
+		}
+
 		std::string WebView::get_url() const TITANIUM_NOEXCEPT
 		{
 			if (webview__ && webview__->Source != nullptr) {
@@ -475,6 +511,27 @@ namespace TitaniumWindows
 			} else {
 				webview__->Navigate(uri);
 			}
+		}
+
+		std::shared_ptr<Titanium::Blob> WebView::get_data() const TITANIUM_NOEXCEPT {
+			using Windows::Security::Cryptography::CryptographicBuffer;
+			using Windows::Security::Cryptography::BinaryStringEncoding;
+
+			if (!html__.empty()) {
+				const auto buffer = CryptographicBuffer::ConvertStringToBinary(TitaniumWindows::Utility::ConvertUTF8String(html__), BinaryStringEncoding::Utf8);
+				const auto data = TitaniumWindows::Utility::GetContentFromBuffer(buffer);
+				const auto Titanium = static_cast<JSObject>(get_context().get_global_object().GetProperty("Titanium"));
+				auto Blob = static_cast<JSObject>(Titanium.GetProperty("Blob"));
+				auto blob = Blob.CallAsConstructor();
+				auto blob_ptr = blob.GetPrivate<Titanium::Blob>();
+				blob_ptr->construct(data);
+				return blob_ptr;
+			} else if (data__) {
+				// return original blob object when it's not a HTML content
+				return data__;
+			}
+
+			return nullptr;
 		}
 
 		bool WebView::canGoBack() TITANIUM_NOEXCEPT
