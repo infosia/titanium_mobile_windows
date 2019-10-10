@@ -86,9 +86,10 @@ namespace TitaniumWindows
 				}, task_continuation_context::use_arbitrary()
 			);
 			event.wait();
+			type_ = Titanium::BlobModule::TYPE::IMAGE;
+		} else {
+			type_ = Titanium::BlobModule::TYPE::FILE;
 		}
-
-		this->type_ = Titanium::BlobModule::TYPE::FILE;
 	}
 
 	::Platform::Guid Blob::getImageEncoder()
