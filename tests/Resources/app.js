@@ -72,7 +72,7 @@ function loadTests() {
 	require('./ti.map.test');
 	require('./ti.media.test');
 	require('./ti.media.audioplayer.test');
-	require('./ti.media.sound.test');
+	//require('./ti.media.sound.test');
 	//require('./ti.media.videoplayer.test');
 	//require('./ti.network.test');
 	require('./ti.network.cookie.test');
