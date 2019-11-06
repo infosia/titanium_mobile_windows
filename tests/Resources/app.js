@@ -69,7 +69,7 @@ function loadTests() {
 	require('./ti.geolocation.test');
 	require('./ti.gesture.test');
 	require('./ti.locale.test');
-	require('./ti.map.test');
+	//require('./ti.map.test');
 	//require('./ti.media.test');
 	require('./ti.media.audioplayer.test');
 	//require('./ti.media.sound.test');
