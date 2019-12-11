@@ -24,13 +24,13 @@ const util = require('util');
 const spawn = require('child_process').spawn; // eslint-disable-line security/detect-child-process
 const EventEmitter = require('events').EventEmitter;
 
-const defaultTypes = [ 'WindowsPhone', 'WindowsStore', 'Windows10' ];
+const defaultTypes = [ 'Windows10' ];
 const configuration = 'Release';
-const vs_architectures = { ARM: 'ARM', x86: 'Win32' }; // x86 -> Win32 mapping
+const vs_architectures = { ARM: 'ARM', x86: 'Win32', ARM64:'ARM64', x64: 'x64' }; // x86 -> Win32 mapping
 const __ = appc.i18n(__dirname).__;
 
 let types = defaultTypes.slice(0);
-let typesMin = [ 'phone', 'store', 'win10' ];
+let typesMin = [ 'win10' ];
 
 function WindowsModuleBuilder() {
 	Builder.apply(this, arguments);
@@ -225,6 +225,9 @@ WindowsModuleBuilder.prototype.generateModuleProject = function generateModulePr
 		},
 		function (done) {
 			runCmake(this, 'WindowsStore', 'ARM', '10.0', done);
+		},
+		function (done) {
+			runCmake(this, 'WindowsStore', 'x64', '10.0', done);
 		}
 	];
 
@@ -525,7 +528,7 @@ function rmdir(dirPath, fs, path, logger, removeSelf) {
 
 function runCmake(data, platform, arch, sdkVersion, next) {
 	var logger = data.logger,
-		generatorName = selectVisualStudio(data) + (arch === 'ARM' ? ' ARM' : ''),
+		generatorName = selectVisualStudio(data),
 		cmakeProjectName = (sdkVersion === '10.0' ? 'Windows10' : platform) + '.' + arch,
 		cmakeWorkDir = path.resolve(data.projectDir, cmakeProjectName);
 
@@ -554,6 +557,16 @@ function runCmake(data, platform, arch, sdkVersion, next) {
 		'-DHAL_RENAME_AXWAYHAL=ON',
 		path.resolve(data.projectDir)
 	];
+
+	if (arch === 'ARM') {
+		cmakeArg.push('-A', 'ARM');
+	} else if (arch === 'ARM64') {
+		cmakeArg.push('-A', 'ARM64');
+	} else if (arch === 'x64') {
+		cmakeArg.push('-A', 'x64');
+	} else {
+		cmakeArg.push('-A', 'Win32');
+	}
 
 	logger.debug(JSON.stringify(cmakeArg, null, 2));
 
